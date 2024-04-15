@@ -79,12 +79,12 @@ namespace SiteWebJO2.Controllers
         [Route("JoSessions/Details/{joSessionId}")]
         public async Task<IActionResult> Details(int? joSessionId)
         {
-            if (joSessionId == null)
+            if (joSessionId == null || _applicationDbContext.JoSessions == null)
             {
                 return NotFound();
             }
 
-            var joSession = await _applicationDbContext.JoSessions.FindAsync(joSessionId);
+            var joSession = await _applicationDbContext.JoSessions.FirstOrDefaultAsync(s => s.JoSessionId == joSessionId);
             if (joSession == null) 
             { 
                 return NotFound();
