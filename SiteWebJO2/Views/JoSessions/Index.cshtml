@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "Available tickets";
+}
+@model SiteWebJO2.Controllers.PaginatedList<JoSession>
+
+<div class="d-inline-flex m-3 container justify-content-center">
+    <h1 class="fontBlue mansalva-regular me-3">Choose a place to be!</h1>
+
+</div>
+
+@* button to filter sessions list *@
+<form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by sport / place: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+            <input type="submit" value="Search" class="btn btn-default" /> |
+            <a asp-action="Index" class="small">Back to Full List</a>
+        </p>
+    </div>
+</form>
+<table class="table" id="ticketsTable">
+    <thead class="text-center text-light bgBlue">
+        <tr>
+            <th scope="col" class="col-2"></th>
+            <th scope="col" class="col-4">
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: white">Sport</a>
+            </th>
+            <th scope="col" class="col-3">
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["PlaceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: white">Place</a>
+            </th>
+            <th scope="col" class="col-3">
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: white">Date</a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var s in Model)
+        {
+            <tr class="ticketsRow" onclick="window.location='JoSessions/Details/@s.JoSessionId'">
+                <th scope="row" class="d-none">@s.JoSessionId</th>
+                <td>
+                    <img src="@Url.Content(s.JoSessionImage)" alt=@s.JoSessionImage height="40" class="logoSport" />
+                </td>
+                <td>@s.JoSessionName</td>
+                <td class="text-center">
+                    @s.JoSessionPlace</td>
+                <td class="text-center">@s.JoSessionDate</td>
+           </tr> 
+        }
+        
+    </tbody>
+</table>
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-page @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-page @nextDisabled">
+    Next
+</a>

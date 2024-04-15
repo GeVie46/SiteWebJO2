@@ -18,6 +18,16 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
+        public IActionResult TicketingTerms()
+        {
+            return View();
+        }
+
+        public IActionResult LegalNotice()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

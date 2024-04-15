@@ -8,7 +8,7 @@ using SiteWebJO2.Data;
 
 #nullable disable
 
-namespace SiteWebJO2.Migrations
+namespace SiteWebJO2.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -17,7 +17,7 @@ namespace SiteWebJO2.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -222,7 +222,7 @@ namespace SiteWebJO2.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("SiteWebJO.Data.JoSession", b =>
+            modelBuilder.Entity("SiteWebJO2.Models.JoSession", b =>
                 {
                     b.Property<int>("JoSessionId")
                         .ValueGeneratedOnAdd()

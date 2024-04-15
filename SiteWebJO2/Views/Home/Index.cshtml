@@ -2,7 +2,26 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-inline-flex m-3 container justify-content-center">
+    <h1 class="fontBlue mansalva-regular me-3">Take a seat to enjoy the event for real!</h1>
+    <a asp-controller="JoSessions" asp-action="Index" class="btn m-2 justify-content-center" id="letsgoBtn">Let's go!</a>
 </div>
+<section class="d-inline-flex container justify-content-center">
+    <div class="row m-2">
+        <div class="card border-0" style="width: 18rem;">
+            <h5 class="card-title text-center">CYCLING</h5>
+            <img class="card-img-top img-fluid" src="~/images/VTT2.jpg" alt="Card image cycling">
+            <p class="card-text text-center">On road, on track, on mountain Freestyle for the spectacle or race for the challenge?</p>
+        </div>
+        <div class="card border-0" style="width: 18rem;">
+            <h5 class="card-title text-center">RUNNING</h5>
+            <img class="card-img-top img-fluid" src="~/images/running2.jpg" alt="Card image running">
+            <p class="card-text text-center">Sprints or long distance races Jumping, throwing, or combination of all A hard choice to make...</p>
+        </div>
+        <div class="card border-0" style="width: 18rem;">
+            <h5 class="card-title text-center">FENCING</h5>
+            <img class="card-img-top img-fluid" src="~/images/escrime.jpg" alt="Card image fencing">
+            <p class="card-text text-center">Individual or team Foil, sabre or épée Who will win the duel?</p>
+        </div>
+    </div>
+</section>

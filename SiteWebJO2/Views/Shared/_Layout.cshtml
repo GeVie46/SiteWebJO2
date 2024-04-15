@@ -3,16 +3,31 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SiteWebJO2</title>
+    <title>@ViewData["Title"] - SiteWebJO</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SiteWebJO2.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SiteWebJO.styles.css" asp-append-version="true" />
+    @*     pour la police Mansalva *@
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,600;0,700;1,400&family=Mansalva&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="container-fluid">
+            <div class="row m-2">
+                <img src="~/images/JO 2024 logo cropped.jpg" class="d-inline-block align-top col-2 logoJO" alt="Olympics logo">
+                <div class="container col-8">
+                    <h1 class="row justify-content-center text-center">Olympic Games 2024</h1>
+                    <div><img src="~/images/paris logo.jpg" class="mx-auto d-block logoParis" alt="Paris logo"></div>
+
+                </div>
+                <div class="col-2"></div>
+            </div>
+        </nav>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white box-shadow mb-1 ms-2">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SiteWebJO2</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -22,9 +37,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+                        @*  <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li> *@
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -37,9 +52,12 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer bgBlue p-2">
         <div class="container">
-            &copy; 2024 - SiteWebJO2 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - SiteWebJO -
+            <a class="bgBlue m-2" asp-area=" " asp-controller="Home" asp-action="TicketingTerms">Ticketing Terms and Conditions</a>
+            <a class="bgBlue m-2" asp-area="" asp-controller="Home" asp-action="LegalNotice">Legal Notice</a>
+            <a class="bgBlue m-2" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy policy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

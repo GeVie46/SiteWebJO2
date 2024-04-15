@@ -1,5 +1,14 @@
+:root {
+    --blue: #00A0FE;
+    --red: #F61732;
+    --yellow: #FDB10E;
+    --green:#169A13;
+}
+
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -9,14 +18,98 @@ html {
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom:0;
+    width: 100%;
+    line-height: 3rem;
+}
+
+.btn:hover {
+    font-weight: bold;
+}
+
+.logoJO {
+    width: 25%;
+    object-fit: scale-down;
+}
+
+.logoParis {
+    width : 30%;
+    object-fit:scale-down;
+}
+
+.logoSport {
+    margin: 0px 0px 0px 5px;
+}
+
+.mansalva-regular {
+    font-family: "Mansalva", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.fontBlue {
+    color: var(--blue);
+}
+
+.bgBlue {
+    background-color: var(--blue);
+    color: white;
+}
+
+/*Specific css for View "Home/Index"*/
+#letsgoBtn {
+    color: var(--red);
+    outline-color: var(--red);
+    outline-style: solid;
+    outline-width: 2px;
+    box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+}
+
+
+/*Specific css for table input view "JoSessions/Index"*/
+#ticketsTable {
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    width: 100%;
+    margin-bottom: 0px;
+}
+
+    #ticketsTable tr {
+        outline: thin solid;
+        outline-color: var(--blue);
+        border-radius: 10px;
+        box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+    }
+
+    .ticketsRow:hover{
+        background-color:azure;
+        cursor: pointer;
+    }
+#ticketsTable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    border-color: var(--blue);
+}
+
+td:first-child,
+th:first-child {
+    border-radius: 10px 0 0 10px;
+}
+
+td:last-child,
+th:last-child {
+    border-radius: 0 10px 10px 0;
+}
+
+.btn-page {
+padding-top: 0px;
 }

@@ -1,0 +1,68 @@
+﻿@model JoSession
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>JoSession</h4>
+    
+    <p>@Model.JoSessionId</p>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionName)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionName)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionPlace)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionPlace)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionNbTotalAttendees)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionNbTotalAttendees)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionNbTotalBooked)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionNbTotalBooked)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionDescription)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionDescription)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionImage)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionImage)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.JoSessionPrice)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.JoSessionPrice)
+        </dd>
+    </dl>
+</div>
+@* <div>
+    <a asp-action="Edit" asp-route-id="@Model?.JoSessionId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div> *@
