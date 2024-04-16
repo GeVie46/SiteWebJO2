@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
+using SiteWebJO2.Services;
 
 namespace SiteWebJO2
 {
@@ -43,6 +45,14 @@ namespace SiteWebJO2
 
             // GV : ajout du hot reload
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+
+            /*
+             * Configure app to support email
+             * code from 
+             * https://learn.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-8.0&tabs=visual-studio
+             */
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
 
             var app = builder.Build();
 
