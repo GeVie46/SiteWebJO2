@@ -30,12 +30,14 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;        //to add role to user
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             SignInManager<ApplicationUser> signInManager,
             ILogger<RegisterModel> logger,
+            RoleManager<IdentityRole> roleManager,      //to add role to user
             IEmailSender emailSender)
         {
             _userManager = userManager;
@@ -44,6 +46,7 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;      //to add role to user
         }
 
         /// <summary>
@@ -138,9 +141,20 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
+                    //start : add role to user
+                    var defaultrole = _roleManager.FindByNameAsync("user").Result;
+
+                    if (defaultrole != null)
+                    {
+                        IdentityResult roleresult = await _userManager.AddToRoleAsync(user, defaultrole.Name);
+                    }
+                    //end
+                    
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
+                    
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(
