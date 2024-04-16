@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualStudio.TextTemplating;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
 using SiteWebJO2.Services;
@@ -16,7 +19,13 @@ namespace SiteWebJO2
             // Add services to the container.
 
             //connect to local database MySQL (MariaDB)
-            var connectionString = builder.Configuration.GetConnectionString("MySqlBaseDevConnection") ?? throw new InvalidOperationException("Connection string 'MySqlBaseDevConnectiontest' not found.");
+            // password stored in user secrets manager
+            var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
+            if (connectionString.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("Connection string 'connection' not found.");
+            }
+
             builder.Services.AddDbContext<ApplicationDbContext>(options => options
                 //version du serveur
                 .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
