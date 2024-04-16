@@ -80,11 +80,13 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
             /// </summary>
             /// 
             [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
             [DataType(DataType.Text)]
             [Display(Name = "First name")]
             public string Name { get; set; }
 
             [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
             [DataType(DataType.Text)]
             [Display(Name = "Last name")]
             public string Lastname { get; set; }

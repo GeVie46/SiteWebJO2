@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 
 namespace SiteWebJO2.Models
@@ -7,8 +9,10 @@ namespace SiteWebJO2.Models
     public class ApplicationUser : IdentityUser
     {
         [PersonalData]
+        [Display(Name = "First name")]
         public string Name { get; set; }
         [PersonalData]
+        [Display(Name = "Last name")]
         public string Lastname { get; set; }
         public Byte[] Userkey { get; set; }
 
