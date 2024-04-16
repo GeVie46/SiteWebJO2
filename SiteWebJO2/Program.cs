@@ -25,7 +25,6 @@ namespace SiteWebJO2
             {
                 throw new InvalidOperationException("Connection string 'connection' not found.");
             }
-
             builder.Services.AddDbContext<ApplicationDbContext>(options => options
                 //version du serveur
                 .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
