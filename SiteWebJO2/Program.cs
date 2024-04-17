@@ -18,15 +18,18 @@ namespace SiteWebJO2
 
             // Add services to the container.
 
-            //connect to local database MySQL (MariaDB)
-            // password stored in user secrets manager
+            /*
+             * connect to local database MySQL (MariaDB)
+             * password stored in user secrets manager
+             * Development server version: new MariaDbServerVersion(new Version(10, 4, 28))
+             */
             var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
             if (connectionString.IsNullOrEmpty())
             {
                 throw new InvalidOperationException("Connection string 'connection' not found.");
             }
             builder.Services.AddDbContext<ApplicationDbContext>(options => options
-                //version du serveur
+ 
                 .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
                 // The following three options help with debugging, but should
                 // be changed or removed for production.
@@ -35,7 +38,9 @@ namespace SiteWebJO2
                 .EnableDetailedErrors()
             );
 
-            //connect to production database MySQL (MariaDB) on Always Data
+            /*
+             * connect to production database MySQL (MariaDB) on Always Data
+             */
             //var connectionString = builder.Configuration.GetConnectionString("MySqlBaseProdConnection") ?? throw new InvalidOperationException("Connection string 'MySqlBaseProdConnection' not found.");
             //builder.Services.AddDbContext<ApplicationDbContext>(options => options
             //    //version du serveur
@@ -45,13 +50,16 @@ namespace SiteWebJO2
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                   
-                //add use of Identity roles in app
+                /*
+                 * Configure app for use of Identity roles
+                 */
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
-            // GV : ajout du hot reload
+            /*
+             * * Configure app for hot reload
+             */
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
             /*

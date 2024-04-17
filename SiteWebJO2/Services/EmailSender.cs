@@ -7,7 +7,7 @@ namespace SiteWebJO2.Services
 {
 
     /*
-     * Implement IEmailSender
+     * Implement IEmailSender class
      * code from 
      * https://learn.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-8.0&tabs=visual-studio
      * TODO : change email address to an email address with the domain name

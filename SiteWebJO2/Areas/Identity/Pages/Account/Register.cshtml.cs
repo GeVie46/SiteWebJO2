@@ -124,6 +124,13 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
+        /*
+         * Method OnPostAsync
+         * create ApplicationUser
+         * create userkey: call to ApplicationUser.GenerateUserKey() method
+         * add role 'user' to user
+         * send an email to confirm email address
+         */
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -134,7 +141,8 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
 
                 user.Name = Input.Name;
                 user.Lastname = Input.Lastname;
-                // creation de la cle utilisateur
+                /* create userkey
+                 */
                 user.Userkey = ApplicationUser.GenerateUserKey();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
