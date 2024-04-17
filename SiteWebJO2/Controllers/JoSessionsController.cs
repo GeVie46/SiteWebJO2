@@ -3,6 +3,7 @@ using SiteWebJO2.Models;
 using SiteWebJO2.Data;
 using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 
 namespace SiteWebJO2.Controllers
 {
@@ -89,7 +90,14 @@ namespace SiteWebJO2.Controllers
             { 
                 return NotFound();
             }
-            
+            HttpContext.Session.SetInt32("joSessionId", joSession.JoSessionId);
+            HttpContext.Session.SetString("joSessionName", joSession.JoSessionName);
+            HttpContext.Session.SetString("joSessionPlace", joSession.JoSessionPlace);
+            HttpContext.Session.SetString("joSessionDate", joSession.JoSessionDate.ToString());
+            HttpContext.Session.SetString("joSessionDescription", joSession.JoSessionDescription);
+            HttpContext.Session.SetString("joSessionImage", joSession.JoSessionImage);
+            HttpContext.Session.SetString("joSessionPrice", joSession.JoSessionPrice.ToString());
+
             return View(joSession);
         }
 

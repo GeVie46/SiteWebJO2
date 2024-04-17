@@ -57,6 +57,21 @@ namespace SiteWebJO2
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
 
+
+            /*
+             *  set up the in-memory session provider with a default in-memory implementation of IDistributedCache
+             *  IdleTimeout: The default is 20 minutes.
+             *  code from 
+             *  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-8.0
+             */
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             /*
              * * Configure app for hot reload
              */
@@ -90,6 +105,11 @@ namespace SiteWebJO2
             app.UseRouting();
 
             app.UseAuthorization();
+
+            /*
+             * set up the in-memory session provider with a default in-memory implementation of IDistributedCache (suite)
+             */
+            app.UseSession();
 
             app.MapControllerRoute(
                 name: "default",
