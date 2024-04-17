@@ -12,12 +12,17 @@ namespace SiteWebJO2.Data
             : base(options)
     {
     }
+        public DbSet<JoSession> JoSessions { get; set; }
+        public DbSet<JoTicketPack> JoTicketPacks { get; set; }
+        public DbSet<JoTicket> JoTickets { get; set; }
+        public DbSet<Order> Orders { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
         }
 
-        public DbSet<JoSession> JoSessions { get; set; }
+       
 }
 }

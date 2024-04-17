@@ -12,8 +12,8 @@ using SiteWebJO2.Data;
 namespace SiteWebJO2.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240415131149_CustomUserTable")]
-    partial class CustomUserTable
+    [Migration("20240417173058_create-tables-Orders-JoTickets-JoTicketsPacks")]
+    partial class createtablesOrdersJoTicketsJoTicketsPacks
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -278,6 +278,111 @@ namespace SiteWebJO2.Data.Migrations
                     b.ToTable("JoSessions");
                 });
 
+            modelBuilder.Entity("SiteWebJO2.Models.JoTicket", b =>
+                {
+                    b.Property<int>("JoTicketId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("JoTicketId"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("JoSessionId")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("JoTicketKey")
+                        .IsRequired()
+                        .HasColumnType("longblob");
+
+                    b.Property<int>("JoTicketPackId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("JoTicketPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<bool>("JoTicketStatus")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("JoTicketId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("JoSessionId");
+
+                    b.HasIndex("JoTicketPackId");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("JoTickets");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.JoTicketPack", b =>
+                {
+                    b.Property<int>("JoTicketPackId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("JoTicketPackId"));
+
+                    b.Property<string>("JoTicketPackName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("JoTicketPackStatus")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("NbAttendees")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("ReductionRate")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("JoTicketPackId");
+
+                    b.ToTable("JoTicketPacks");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.Order", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<decimal>("OrderAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("TransactionId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -327,6 +432,74 @@ namespace SiteWebJO2.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.JoTicket", b =>
+                {
+                    b.HasOne("SiteWebJO2.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("JoTickets")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SiteWebJO2.Models.JoSession", "JoSession")
+                        .WithMany("JoTickets")
+                        .HasForeignKey("JoSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SiteWebJO2.Models.JoTicketPack", "JoTicketPack")
+                        .WithMany("JoTickets")
+                        .HasForeignKey("JoTicketPackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SiteWebJO2.Models.Order", "Order")
+                        .WithMany("JoTickets")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("JoSession");
+
+                    b.Navigation("JoTicketPack");
+
+                    b.Navigation("Order");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.Order", b =>
+                {
+                    b.HasOne("SiteWebJO2.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("Orders")
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("JoTickets");
+
+                    b.Navigation("Orders");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.JoSession", b =>
+                {
+                    b.Navigation("JoTickets");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.JoTicketPack", b =>
+                {
+                    b.Navigation("JoTickets");
+                });
+
+            modelBuilder.Entity("SiteWebJO2.Models.Order", b =>
+                {
+                    b.Navigation("JoTickets");
                 });
 #pragma warning restore 612, 618
         }

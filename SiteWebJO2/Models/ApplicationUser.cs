@@ -17,10 +17,15 @@ namespace SiteWebJO2.Models
         [PersonalData]
         [Display(Name = "First name")]
         public string Name { get; set; }
+
         [PersonalData]
         [Display(Name = "Last name")]
         public string Lastname { get; set; }
+
         public Byte[] Userkey { get; set; }
+
+        public ICollection<Order> Orders { get; set; }
+        public ICollection<JoTicket> JoTickets { get; set; }
 
         /*
          * method GenerateUserKey(): Generate a 128-bit salt using a sequence of cryptographically strong random bytes.
