@@ -36,7 +36,7 @@ namespace SiteWebJO2.Controllers
                 searchString = currentFilter;
             }
 
-            // get data
+            // get JoSessions data
             var js = from s in _applicationDbContext.JoSessions
                      select s;
             js = GetAvailableJoSessions(js);
@@ -98,7 +98,12 @@ namespace SiteWebJO2.Controllers
             HttpContext.Session.SetString("joSessionImage", joSession.JoSessionImage);
             HttpContext.Session.SetString("joSessionPrice", joSession.JoSessionPrice.ToString());
 
-            return View(joSession);
+            // get data
+            var js = from s in _applicationDbContext.JoTicketPacks
+                     select s;
+            js = GetOnUseJoTicketPacks(js);
+
+            return View(js);
         }
 
 
@@ -110,15 +115,25 @@ namespace SiteWebJO2.Controllers
             return joSessionsList.Where(s => s.JoSessionNbTotalBooked < s.JoSessionNbTotalAttendees);
         }
 
+        /*
+         * get on use JoTicketPack
+         */
+        public static IQueryable<JoTicketPack> GetOnUseJoTicketPacks(IQueryable<JoTicketPack> joTicketPacksList)
+        {
+            return joTicketPacksList.Where(p => p.JoTicketPackStatus);
+        }
+
 
         /* 
-         * création d'une liste de JoSession
-         * ajout des données à la base de données
-         * à appeler à la main
+         * add data in database, call it manually with .../JoSessions/AddData
+         * create JoSessions, 
          */
         public async Task<IActionResult> AddData()
         {
-            // JoSessionId auto généré
+            /*
+             * Add JoSessions
+             * JoSessionId: auto increment
+             */
             List<JoSession> JoSessionsList = new List<JoSession>
                 {
                 new JoSession {JoSessionName = "Equestrian Dressage - Mixed", JoSessionDate = new DateTime(2024, 8, 1, 11, 0, 0), JoSessionPlace = "Versailles, Château de Versailles", JoSessionNbTotalAttendees= 10000, JoSessionNbTotalBooked= 5000, JoSessionDescription="EQD01 Dressage grand prix team and individual qualifier", JoSessionImage=@"~/images/Equestrian.jpg", JoSessionPrice=50 },
@@ -141,6 +156,20 @@ namespace SiteWebJO2.Controllers
             };
 
             _applicationDbContext.JoSessions.AddRange(JoSessionsList);
+
+            /*
+            * Add JoTicketsPacks
+            * JoTicketPackId: auto increment
+            */
+            List<JoTicketPack> JoTicketPacksList = new List<JoTicketPack>
+                {
+                new JoTicketPack {JoTicketPackName = "Duo Pack", NbAttendees = 2, ReductionRate = 0.05m, JoTicketPackStatus= true },
+                new JoTicketPack {JoTicketPackName = "Family Pack", NbAttendees = 4, ReductionRate = 0.10m, JoTicketPackStatus= true },
+                new JoTicketPack {JoTicketPackName = "Solo", NbAttendees = 1, ReductionRate = 0.00m, JoTicketPackStatus= true },
+                };
+
+            _applicationDbContext.JoTicketPacks.AddRange(JoTicketPacksList);
+
             await _applicationDbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");

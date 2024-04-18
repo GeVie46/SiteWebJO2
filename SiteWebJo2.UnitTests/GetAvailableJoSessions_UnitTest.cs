@@ -52,7 +52,7 @@ namespace SiteWebJo.UnitTests
 
             //check if test passes
             // use JavaScriptSerializer() to compare objects
-            Assert.AreNotEqual(JsonSerializer.Serialize(joSessionListQueryable), JsonSerializer.Serialize(result), "the session " + joSessionList[0].JoSessionName + " should NOT be in the result, but the program keep it");
+            Assert.AreNotEqual(JsonSerializer.Serialize(joSessionListQueryable), JsonSerializer.Serialize(result), "the session " + joSessionList[0].JoSessionName + " should NOT be in the result, but the program keeps it");
 
         }
     }
