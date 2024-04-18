@@ -77,6 +77,10 @@ namespace SiteWebJO2.Controllers
             return View(await PaginatedList<JoSession>.CreateAsync(js.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
+        /*
+         * display offers concerning JoSession selected
+         */
+
         [Route("JoSessions/Details/{joSessionId}")]
         public async Task<IActionResult> Details(int? joSessionId)
         {
@@ -90,6 +94,7 @@ namespace SiteWebJO2.Controllers
             { 
                 return NotFound();
             }
+            //save selected joSession data in Html session
             HttpContext.Session.SetInt32("joSessionId", joSession.JoSessionId);
             HttpContext.Session.SetString("joSessionName", joSession.JoSessionName);
             HttpContext.Session.SetString("joSessionPlace", joSession.JoSessionPlace);
@@ -98,7 +103,7 @@ namespace SiteWebJO2.Controllers
             HttpContext.Session.SetString("joSessionImage", joSession.JoSessionImage);
             HttpContext.Session.SetString("joSessionPrice", joSession.JoSessionPrice.ToString());
 
-            // get data
+            // get JoTicketPacks data
             var js = from s in _applicationDbContext.JoTicketPacks
                      select s;
             js = GetOnUseJoTicketPacks(js);
@@ -121,6 +126,15 @@ namespace SiteWebJO2.Controllers
         public static IQueryable<JoTicketPack> GetOnUseJoTicketPacks(IQueryable<JoTicketPack> joTicketPacksList)
         {
             return joTicketPacksList.Where(p => p.JoTicketPackStatus);
+        }
+
+        /*
+         * calculate price of joTicketPack
+         * @param 
+         */
+        public static decimal GetJoTicketPackPrice (decimal joSessionPrice, int nbAttendees, decimal reductionRate)
+        {
+            return Math.Round(Convert.ToDecimal(joSessionPrice) * (1 - reductionRate) * nbAttendees, 2);
         }
 
 

@@ -90,10 +90,11 @@ body {
         box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
     }
 
-    .ticketsRow:hover{
-        background-color:azure;
-        cursor: pointer;
-    }
+.ticketsRow:hover {
+    background-color: azure;
+    cursor: pointer;
+    color: var(--blue);
+}
 #ticketsTable th {
     padding-top: 12px;
     padding-bottom: 12px;
@@ -113,3 +114,19 @@ th:last-child {
 .btn-page {
 padding-top: 0px;
 }
+
+/*Specific css for View "JoSessions/Details"*/
+.cardOffers {
+    outline: thin solid;
+    outline-color: var(--blue);
+    border-radius: 10px;
+    box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+    .cardOffers:hover {
+        background-color: azure;
+        cursor: pointer;
+        color: var(--blue);
+    }
