@@ -23,29 +23,39 @@ namespace SiteWebJO2
              * password stored in user secrets manager
              * Development server version: new MariaDbServerVersion(new Version(10, 4, 28))
              */
-            var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
-            if (connectionString.IsNullOrEmpty())
-            {
-                throw new InvalidOperationException("Connection string 'connection' not found.");
-            }
-            builder.Services.AddDbContext<ApplicationDbContext>(options => options
- 
-                .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
-                // The following three options help with debugging, but should
-                // be changed or removed for production.
-                .LogTo(Console.WriteLine, LogLevel.Information)
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors()
-            );
+            //var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
+            //if (connectionString.IsNullOrEmpty())
+            //{
+            //    throw new InvalidOperationException("Connection string 'connection' not found.");
+            //}
+            //builder.Services.AddDbContext<ApplicationDbContext>(options => options
+
+            //    .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
+            //    // The following three options help with debugging, but should
+            //    // be changed or removed for production.
+            //    .LogTo(Console.WriteLine, LogLevel.Information)
+            //    .EnableSensitiveDataLogging()
+            //    .EnableDetailedErrors()
+            //);
 
             /*
              * connect to production database MySQL (MariaDB) on Always Data
+             * DATABASE_URL : environment variable to be declared in the secret of the app on fly.io. connection string to the database
              */
-            //var connectionString = builder.Configuration.GetConnectionString("MySqlBaseProdConnection") ?? throw new InvalidOperationException("Connection string 'MySqlBaseProdConnection' not found.");
-            //builder.Services.AddDbContext<ApplicationDbContext>(options => options
-            //    //version du serveur
-            //    .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 6, 16)))
-            //);
+
+            //to update production database
+            //var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
+
+            var MySqlBaseProdConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
+
+            if (MySqlBaseProdConnection == null)
+            {
+                throw new InvalidOperationException("Connection string 'MySqlBaseProdConnection' not found (check that environment variable DATABASE_URL exists on fly.io).");
+            }
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options
+                //version du serveur
+                .UseMySql(MySqlBaseProdConnection, new MariaDbServerVersion(new Version(10, 6, 16)))
+            );
 
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -56,21 +66,6 @@ namespace SiteWebJO2
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
-
-
-            /*
-             *  set up the in-memory session provider with a default in-memory implementation of IDistributedCache
-             *  IdleTimeout: The default is 20 minutes.
-             *  code from 
-             *  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-8.0
-             */
-            builder.Services.AddDistributedMemoryCache();
-
-            builder.Services.AddSession(options =>
-            {
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
 
             /*
              * * Configure app for hot reload
@@ -105,11 +100,6 @@ namespace SiteWebJO2
             app.UseRouting();
 
             app.UseAuthorization();
-
-            /*
-             * set up the in-memory session provider with a default in-memory implementation of IDistributedCache (suite)
-             */
-            app.UseSession();
 
             app.MapControllerRoute(
                 name: "default",
