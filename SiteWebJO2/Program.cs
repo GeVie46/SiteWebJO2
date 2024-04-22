@@ -40,12 +40,14 @@ namespace SiteWebJO2
 
             /*
              * connect to production database MySQL (MariaDB) on Always Data
-             * DATABASE_URL : environment variable to be declared in the secret of the app on fly.io. connection string to the database
-             */
-
+             * 
+             
             //to update production database
             //var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
 
+            /* 
+             * DATABASE_URL : environment variable to be declared in the secret of the app on fly.io. connection string to the database
+             */
             var MySqlBaseProdConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
 
             if (MySqlBaseProdConnection == null)
@@ -57,6 +59,8 @@ namespace SiteWebJO2
                 .UseMySql(MySqlBaseProdConnection, new MariaDbServerVersion(new Version(10, 6, 16)))
             );
 
+
+
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
@@ -66,6 +70,20 @@ namespace SiteWebJO2
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+
+            /*
+             *  set up the in-memory session provider with a default in-memory implementation of IDistributedCache
+             *  IdleTimeout: The default is 20 minutes.
+             *  code from 
+             *  https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-8.0
+             */
+            builder.Services.AddDistributedMemoryCache();
+
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
 
             /*
              * * Configure app for hot reload
@@ -101,9 +119,15 @@ namespace SiteWebJO2
 
             app.UseAuthorization();
 
+            /*
+             * set up the in-memory session provider with a default in-memory implementation of IDistributedCache (suite)
+             */
+            app.UseSession();
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
             app.MapRazorPages();
 
             app.Run();
