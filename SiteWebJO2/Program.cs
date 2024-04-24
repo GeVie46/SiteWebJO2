@@ -40,15 +40,15 @@ namespace SiteWebJO2
 
             /*
              * connect to production database MySQL (MariaDB) on Always Data
-             * 
+             */ 
              
             //to update production database
-            //var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
+            var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
 
             /* 
              * DATABASE_URL : environment variable to be declared in the secret of the app on fly.io. connection string to the database
              */
-            var MySqlBaseProdConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
+            //var MySqlBaseProdConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
 
             if (MySqlBaseProdConnection == null)
             {
