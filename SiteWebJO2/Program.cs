@@ -23,41 +23,41 @@ namespace SiteWebJO2
              * password stored in user secrets manager
              * Development server version: new MariaDbServerVersion(new Version(10, 4, 28))
              */
-            //var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
-            //if (connectionString.IsNullOrEmpty())
-            //{
-            //    throw new InvalidOperationException("Connection string 'connection' not found.");
-            //}
-            //builder.Services.AddDbContext<ApplicationDbContext>(options => options
+            var connectionString = (builder.Configuration.GetConnectionString("MySqlBaseDevConnection") + ";pwd=" + builder.Configuration["DbPassword"]).ToString();
+            if (connectionString.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("Connection string 'connection' not found.");
+            }
+            builder.Services.AddDbContext<ApplicationDbContext>(options => options
 
-            //    .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
-            //    // The following three options help with debugging, but should
-            //    // be changed or removed for production.
-            //    .LogTo(Console.WriteLine, LogLevel.Information)
-            //    .EnableSensitiveDataLogging()
-            //    .EnableDetailedErrors()
-            //);
+                .UseMySql(connectionString, new MariaDbServerVersion(new Version(10, 4, 28)))
+                // The following three options help with debugging, but should
+                // be changed or removed for production.
+                .LogTo(Console.WriteLine, LogLevel.Information)
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors()
+            );
 
             /*
              * connect to production database MySQL (MariaDB) on Always Data
-             */ 
-             
+             */
+
             //to update production database
-            var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
+            //var MySqlBaseProdConnection = builder.Configuration["DATABASE_URL"].ToString();
 
             /* 
              * DATABASE_URL : environment variable to be declared in the secret of the app on fly.io. connection string to the database
              */
             //var MySqlBaseProdConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
 
-            if (MySqlBaseProdConnection == null)
-            {
-                throw new InvalidOperationException("Connection string 'MySqlBaseProdConnection' not found (check that environment variable DATABASE_URL exists on fly.io).");
-            }
-            builder.Services.AddDbContext<ApplicationDbContext>(options => options
-                //version du serveur
-                .UseMySql(MySqlBaseProdConnection, new MariaDbServerVersion(new Version(10, 6, 16)))
-            );
+            //if (MySqlBaseProdConnection == null)
+            //{
+            //    throw new InvalidOperationException("Connection string 'MySqlBaseProdConnection' not found (check that environment variable DATABASE_URL exists on fly.io).");
+            //}
+            //builder.Services.AddDbContext<ApplicationDbContext>(options => options
+            //    //version du serveur
+            //    .UseMySql(MySqlBaseProdConnection, new MariaDbServerVersion(new Version(10, 6, 16)))
+            //);
 
 
 
@@ -97,6 +97,10 @@ namespace SiteWebJO2
              */
             builder.Services.AddTransient<IEmailSender, EmailSender>();
             builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration);
+
+            /* to access the currently logged in user
+             */
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
