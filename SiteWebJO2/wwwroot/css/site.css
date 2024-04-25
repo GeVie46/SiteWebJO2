@@ -34,7 +34,18 @@ body {
     margin-bottom: 0px;
 }
 
+.menu {
+    border: none;
+    background: none;
+    color: rgba(0, 0, 0, .55);
+}
+
+.menu:hover {
+    font-weight: bold;
+}
+
 .footer {
+    position: static;
     bottom:0;
     width: 100%;
     line-height: 3rem;
