@@ -9,25 +9,28 @@
     var user = await UserManager.GetUserAsync(HttpContextAccessor.HttpContext.User);
 }
 
-<ul class="navbar-nav  flex-column">
+<ul class="navbar-nav flex-column">
 @if (SignInManager.IsSignedIn(User))
 {
     <li class="nav-item">
-            <a class="nav-link text-dark text-capitalize" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@user.Name @user.Lastname</a>
+            <a class="nav-link btn btn-link text-dark text-capitalize text-end" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">@user.Name @user.Lastname</a>
+    </li>
+    <li class="nav-item">
+            <button type="submit" class="nav-link btn btn-link text-dark text-end">Shopping cart <i class="bi bi-cart"></i></button>
     </li>
     <li class="nav-item">
         <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
+                <button type="submit" class="nav-link btn btn-link text-dark text-end">Logout <i class="bi bi-box-arrow-right"></i></button>
+        </form>   
     </li>
 }
 else
 {
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a class="nav-link text-dark text-end" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a class="nav-link text-dark text-end" asp-area="Identity" asp-page="/Account/Login">Login <i class="bi bi-box-arrow-in-right"></i></a>
     </li>
 }
 </ul>

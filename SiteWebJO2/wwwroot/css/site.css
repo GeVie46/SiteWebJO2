@@ -17,6 +17,12 @@ html {
   }
 }
 
+header .nav-link {
+    padding: 0.2rem 0 0.2rem 0;
+    width: 150px;
+}
+
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
@@ -41,8 +47,8 @@ body {
 }
 
 .logoJO {
-    width: 50%;
-    object-fit: cover;
+    max-width: 50%;
+    object-fit:contain;
 }
 
 .logoParis {
@@ -102,7 +108,7 @@ body {
     /*Specific css for table input view "JoSessions/Index"*/
     #ticketsTable {
         border-collapse: separate;
-        border-spacing: 0 15px;
+        border-spacing: 0 10px;
         width: 100%;
         margin-bottom: 0px;
     }
