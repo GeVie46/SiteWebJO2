@@ -4,6 +4,7 @@ using SiteWebJO2.Data;
 using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SiteWebJO2.Controllers
 {
@@ -140,8 +141,10 @@ namespace SiteWebJO2.Controllers
 
         /* 
          * add data in database, call it manually with .../JoSessions/AddData
-         * create JoSessions, 
+         * create JoSessions, JoTicketsPacks
+         * access only for ADMIN
          */
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddData()
         {
             /*
