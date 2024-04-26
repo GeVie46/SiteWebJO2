@@ -7,6 +7,15 @@
 // add a ticket to ShoppingCart
 // store each ticket as an object in an array in json format, and save in a cookie
 function addTicket(joTicketPackId, joSessionId) {
+
+    //check if user is logged in. If not, cancel add to cart and redirect to login page
+    var signed = $('#logged').val();
+    if (signed === 'false') {
+        alert("You must login to add tickets to your shopping cart");
+        window.location.href = '/Identity/Account/Login';
+        return;
+    }
+
     console.log(`addTicket to Cart joTicketPackId: ${joTicketPackId}, joSessionId: ${joSessionId}`);
     //create object to store
     var ticket = {
@@ -28,7 +37,7 @@ function addTicket(joTicketPackId, joSessionId) {
     document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
 
     //inform user that ticket is added
-    alert("the ticket is in your shopping cart " + JSON.stringify(shoppingCartCookie));
+    alert("The ticket is in your shopping cart");
 }
 
 //returns the value of a specified cookie

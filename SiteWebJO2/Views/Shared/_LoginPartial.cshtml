@@ -12,6 +12,10 @@
 <ul class="navbar-nav flex-column">
 @if (SignInManager.IsSignedIn(User))
 {
+    // to know if user is logged in in javascript
+    <input type="hidden" id="logged" value="true" />
+
+    //display menu with authentified user
     <li class="nav-item">
         <a class="nav-link text-capitalize text-end menu" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage account">@user.Name @user.Lastname</a>
     </li>
@@ -26,11 +30,15 @@
 }
 else
 {
+    // to know if user is logged in in javascript
+        <input type="hidden" id="logged" value="false" />
+
+   //display menu with UNauthentified user
     <li class="nav-item">
-            <a class="nav-link text-end menu" asp-area="Identity" asp-page="/Account/Register">Register</a>
+         <a class="nav-link text-end menu" asp-area="Identity" asp-page="/Account/Register">Register</a>
     </li>
     <li class="nav-item">
-                <a class="nav-link text-end menu" asp-area="Identity" asp-page="/Account/Login">Login <i class="bi bi-box-arrow-in-right"></i></a>
+         <a class="nav-link text-end menu" asp-area="Identity" asp-page="/Account/Login">Login <i class="bi bi-box-arrow-in-right"></i></a>
     </li>
 }
 </ul>
