@@ -28,7 +28,7 @@
         <div class="row m-2 d-inline-flex container justify-content-center">
             @foreach(var p in Model)
             {
-                <div class="card border-1 mb-2 p-2 cardOffers" style="width: 18rem;">
+            <div class="card border-1 mb-2 p-2 cardOffers" style="width: 18rem;" onclick="addTicket(@p.JoTicketPackId, @HttpContextAccessor.HttpContext.Session.GetInt32("joSessionId"))">
                     <h3 class="card-title text-center">@p.JoTicketPackName</h3>
                     @if (@p.NbAttendees > 1)
                     {
@@ -59,3 +59,4 @@
 @*     <a asp-action="Edit" asp-route-id="@Model?.JoSessionId">Edit</a> *@
     <a asp-action="Index" >Back to List</a>
 </div>
+
