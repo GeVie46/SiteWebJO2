@@ -41,7 +41,8 @@ function addTicket(joTicketPackId, joSessionId) {
     document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
 
     //inform user that ticket is added
-    alert("The ticket is in your shopping cart");
+    var myModalElement = customModal("Action done", "The ticket was added to your shopping cart");
+    myModalElement.show();
 }
 
 //returns the value of a specified cookie
