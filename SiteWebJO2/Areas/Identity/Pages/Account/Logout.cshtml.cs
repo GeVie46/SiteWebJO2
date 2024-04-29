@@ -28,6 +28,10 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+
+            //delete Shopping cart cookie
+            Response.Cookies.Delete("jo2024Cart");
+
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

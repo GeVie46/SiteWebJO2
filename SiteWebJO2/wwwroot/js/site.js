@@ -65,6 +65,8 @@ function getCookie(cname) {
     return [];
 }
 
+// custom display of bootstrap modal
+// modal template defined in Layout.cshtml
 function customModal(title, text) {
     
     document.getElementById("MsgModalTitle").innerHTML = title;
