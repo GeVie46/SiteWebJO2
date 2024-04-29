@@ -4,7 +4,7 @@ using SiteWebJO2.Controllers;
 using System.Text.Json;
 using System.Collections.Generic;
 
-namespace SiteWebJo.UnitTests
+namespace SiteWebJo2.UnitTests
 {
 
     [TestClass]

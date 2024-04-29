@@ -69,6 +69,24 @@
             <a class="bgBlue m-2" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy policy</a>
         </div>
     </footer>
+
+    <!-- Message Modal -->
+    <div class="modal fade" id="MsgModal" tabindex="-1" role="dialog" aria-labelledby="Information" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="MsgModalTitle">Modal title</h5>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-title" id="MsgModalText">Modal text</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeButton" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

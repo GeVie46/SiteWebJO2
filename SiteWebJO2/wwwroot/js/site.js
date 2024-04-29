@@ -11,8 +11,12 @@ function addTicket(joTicketPackId, joSessionId) {
     //check if user is logged in. If not, cancel add to cart and redirect to login page
     var signed = $('#logged').val();
     if (signed === 'false') {
-        alert("You must login to add tickets to your shopping cart");
-        window.location.href = '/Identity/Account/Login';
+
+        var myModalElement = customModal("Action impossible", "You must login to add tickets to your shopping cart");
+        myModalElement.show();
+        $(document).on('hidden.bs.modal', '#MsgModal', function () {
+                window.location.href = '/Identity/Account/Login';
+        });
         return;
     }
 
@@ -58,4 +62,13 @@ function getCookie(cname) {
     }
     //if cookie doesnt exist, or is null, return an empty array
     return [];
+}
+
+function customModal(title, text) {
+    
+    document.getElementById("MsgModalTitle").innerHTML = title;
+    document.getElementById("MsgModalText").innerHTML = text;
+    const myModal = document.getElementById("MsgModal");
+    const myModalElement = new bootstrap.Modal(myModal);
+    return myModalElement;
 }

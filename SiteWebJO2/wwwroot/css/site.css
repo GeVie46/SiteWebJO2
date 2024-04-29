@@ -85,6 +85,13 @@ body {
     color: white;
 }
 
+.bgYellow {
+    background-color: var(--yellow);
+    color: #545B62;
+}
+
+/*Specific css for site buttons*/
+
 .letsgoBtn {
     color: var(--red);
     outline-color: var(--red);
@@ -114,6 +121,18 @@ body {
     box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
 }
 
+/*Specific css for site modals */
+.modal-header {
+    border-bottom: none;
+    background-color: var(--yellow);
+    color: #545B62;
+}
+.modal-body {
+    border-bottom: none;
+}
+.modal-footer {
+    border-top: none;
+}
 
     /*Specific css for table input view "JoSessions/Index"*/
     #ticketsTable {
