@@ -4,7 +4,7 @@ This is a project done for the final exam to get the diploma of digital solution
 You can see the website in action [HERE] (https://jo2024tickets.fly.dev/).
 
 ### Tech stack
-ASP.NET Core Web App MVC
+ASP.NET Core Web App MVC. 
 Frameworks : .NET 8.0, AspNetCore Identity, EntityFrameworkCore
 
 ### Description
