@@ -1,7 +1,7 @@
 # SiteWebJO2
-This is a project done for the final exam to get the diploma of digital solutions designer and developer Bachelor. Here is the Bachelor description: (https://www.francecompetences.fr/recherche/rncp/36146/).
+This is a project done for the final exam to get the diploma of digital solutions designer and developer Bachelor. Here is the Bachelor description: https://www.francecompetences.fr/recherche/rncp/36146/.
 
-You can see the website in action [HERE] (https://jo2024tickets.fly.dev/).
+You can see the website in action here: https://jo2024tickets.fly.dev/.
 
 ### Tech stack
 ASP.NET Core Web App MVC
