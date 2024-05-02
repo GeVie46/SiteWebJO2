@@ -26,9 +26,31 @@
 
     }
 
+    /*
+     * Class used for sending cookie data from client side to server side
+     */
     public class JoTicketSimplified
     {
-        public int joTicketPackId { get; set; }
-        public int joSessionId { get; set; }
+        public int JoTicketPackId { get; set; }
+        public int JoSessionId { get; set; }
+
+    }
+
+    /*
+     * Class used for display shopping cart
+     */
+    public class ShoppingCartTicket (int joTicketPackId, int joSessionId, string joSessionName, DateTime joSessionDate, string joSessionPlace, string joSessionImage, decimal jopackPrice, String joTicketPackName, int nbAttendees, decimal reductionRate)
+    {
+        public int JoTicketPackId { get; set; } = joTicketPackId;
+        public int JoSessionId { get; set; } = joSessionId;
+        public string JoSessionName { get; set; } = joSessionName;
+        public DateTime JoSessionDate { get; set; } = joSessionDate;
+        public string JoSessionPlace { get; set; } = joSessionPlace;
+        public string JoSessionImage { get; set; } = joSessionImage;
+        public decimal JoPackPrice { get; set; } = jopackPrice;
+        public String JoTicketPackName { get; set; } = joTicketPackName;
+        public int NbAttendees { get; set; } = nbAttendees;
+        public decimal ReductionRate { get; set; } = reductionRate;
+
     }
 }
