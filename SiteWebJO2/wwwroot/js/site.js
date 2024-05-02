@@ -115,13 +115,12 @@ function displayShoppingCart() {
                 // get data of joSession and joTicketPack
                 PostToController("/ShoppingCarts/GetTicketData", t)
                     .then((donnees) => {
-                        console.log(donnees);
                         //create line in shopping cart
-                        createTicketCard(countLine, donnees);
+                        createTicketCard(countLine, donnees); 
+                        ++countLine;
                         console.log(countLine);
                     });
 
-                ++countLine;
             }
             lastTicket = t;
         });
@@ -153,7 +152,6 @@ async function PostToController(url, data) {
 
 
 // function to create a new line for a ticket in shopping cart
-// TODO : bug : countCard always set to 2
 function createTicketCard(countCard, ticket) {
     let container = document.getElementById("shoppingCartTableBody");
 
@@ -217,7 +215,6 @@ function createTicketCard(countCard, ticket) {
         BtnListLink.innerHTML = i;
         BtnListEl.appendChild(BtnListLink);
         BtnList.appendChild(BtnListEl);
-        
     }
 
     // create table data "price each"
