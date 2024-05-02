@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SiteWebJO2.Models;
+using System.Text.Json;
 
 namespace SiteWebJO2.Controllers
 {
@@ -15,5 +17,12 @@ namespace SiteWebJO2.Controllers
         {
             return View();
         }
+
+      
+        public string GetTicketData([FromBody] JoTicketSimplified joTicketSimplified) {
+  
+            return JsonSerializer.Serialize(new { Name = joTicketSimplified.joTicketPackId, DateTime = DateTime.Now.ToShortDateString() });
+        }
     }
+
 }

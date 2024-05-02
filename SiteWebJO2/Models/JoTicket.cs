@@ -25,4 +25,10 @@
         public JoSession JoSession { get; set; }
 
     }
+
+    public class JoTicketSimplified
+    {
+        public int joTicketPackId { get; set; }
+        public int joSessionId { get; set; }
+    }
 }

@@ -75,3 +75,42 @@ function customModal(title, text) {
     const myModalElement = new bootstrap.Modal(myModal);
     return myModalElement;
 }
+
+function displayShoppingCart() {
+    //get the shoppingCart cookie string (array of ticket)
+    let shoppingCartCookie = getCookie("jo2024Cart");
+    console.log(shoppingCartCookie);
+
+    if (shoppingCartCookie.length != 0) {
+        shoppingCartCookie.forEach((e) => {
+            var postPromise = PostToController("/ShoppingCarts/GetTicketData", e);
+            alert(postPromise);
+        });
+    }
+}
+
+
+function PostToController(url, data) {
+
+    fetch(url, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Json Response:', json);
+            return response.json();
+        }
+        else {
+            console.log('Json Response:', json)
+            console.log('error', response);
+        }
+    })
+    .catch(error => console.log('Request failed:', error)); 
+}
+
+
+
