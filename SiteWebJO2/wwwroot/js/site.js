@@ -69,8 +69,8 @@ function getCookie(cname) {
 // modal template defined in Layout.cshtml
 function customModal(title, text) {
     
-    document.getElementById("MsgModalTitle").innerHTML = title;
-    document.getElementById("MsgModalText").innerHTML = text;
+    document.getElementById("MsgModalTitle").textContent = title;
+    document.getElementById("MsgModalText").textContent = text;
     const myModal = document.getElementById("MsgModal");
     const myModalElement = new bootstrap.Modal(myModal);
     return myModalElement;
@@ -88,7 +88,7 @@ function displayShoppingCart() {
     if (shoppingCartCookie.length == 0) {
         document.getElementById("shoppingCartTable").hidden = true;
         var msg = document.createElement("span");
-        msg.innerHTML = "Nothing in cart still";
+        msg.textContent = "Nothing in cart still";
         document.getElementById("shoppingCartTablePosition").appendChild(msg);
         return;
     }
@@ -104,19 +104,16 @@ function displayShoppingCart() {
         };
         let countLine = 0;
         shoppingCartCookie.forEach((t) => {
-            if (JSON.stringify(t) === JSON.stringify(lastTicket)) {
-                // same ticket => increment nb of ticket
-                
+            if (JSON.stringify(t) != JSON.stringify(lastTicket)) {
 
-            }
-            else {
                 // ticket not already exists => add a new line
 
                 // get data of joSession and joTicketPack
                 PostToController("/ShoppingCarts/GetTicketData", t)
                     .then((donnees) => {
                         //create line in shopping cart
-                        createTicketCard(countLine, donnees); 
+                        let nb = countSameTicket(t, shoppingCartCookie);
+                        createTicketCard(countLine, donnees, nb); 
                         ++countLine;
                         console.log(countLine);
                     });
@@ -152,7 +149,7 @@ async function PostToController(url, data) {
 
 
 // function to create a new line for a ticket in shopping cart
-function createTicketCard(countCard, ticket) {
+function createTicketCard(countCard, ticket, nb) {
     let container = document.getElementById("shoppingCartTableBody");
 
     // create HTML card
@@ -164,7 +161,7 @@ function createTicketCard(countCard, ticket) {
     let headerEl = document.createElement("th");
     headerEl.scope = "row";
     headerEl.className = "d-none";
-    headerEl.innerHTML = JSON.stringify(ticket);
+    headerEl.textContent = JSON.stringify(ticket);
     rowEl.appendChild(headerEl);
 
     // create table img
@@ -181,7 +178,7 @@ function createTicketCard(countCard, ticket) {
     let dataDescDiv = document.createElement("td");
     rowEl.appendChild(dataDescDiv);
     let SessionNameEl = document.createElement("h5");
-    SessionNameEl.innerHTML = ticket.JoSessionName;
+    SessionNameEl.textContent = ticket.JoSessionName;
     SessionNameEl.style = "margin:0";
     dataDescDiv.appendChild(SessionNameEl);
     let SessionDetailsEl = document.createElement("p");
@@ -195,13 +192,14 @@ function createTicketCard(countCard, ticket) {
     dataButtonEl.className = "dropdown";
     rowEl.appendChild(dataButtonEl);
     let BtnEl = document.createElement("button");
-    BtnEl.style = "background:light";
+    BtnEl.style = "background-color:white";
     BtnEl.className = "btn dropdown-toggle";
     BtnEl.type = "button";
-    BtnEl.setAttribute("id", "NbTicketButton" + countCard);
+    BtnEl.id = "NbTicketButton" + countCard;
+    //BtnEl.setAttribute("id", "NbTicketButton" + countCard);
     BtnEl.setAttribute("data-bs-toggle", "dropdown");
     BtnEl.ariaExpanded = "false";
-    BtnEl.innerHTML = 1;    //by default
+    BtnEl.textContent = nb;
     dataButtonEl.appendChild(BtnEl);
     let BtnList = document.createElement("ul");
     BtnList.className = "dropdown-menu";
@@ -212,7 +210,7 @@ function createTicketCard(countCard, ticket) {
         let BtnListLink = document.createElement("a");
         BtnListLink.className = "dropdown-item";
         BtnListLink.href = "#";
-        BtnListLink.innerHTML = i;
+        BtnListLink.textContent = i;
         BtnListEl.appendChild(BtnListLink);
         BtnList.appendChild(BtnListEl);
     }
@@ -222,7 +220,7 @@ function createTicketCard(countCard, ticket) {
     dataPriceOneEl.style = "text-align:center";
     rowEl.appendChild(dataPriceOneEl);
     let PriceOneEl = document.createElement("h5");
-    PriceOneEl.innerHTML = ticket.JoPackPrice.toFixed(2) + "€";
+    PriceOneEl.textContent = ticket.JoPackPrice.toFixed(2) + "€";
     PriceOneEl.style = "margin:0";
     dataPriceOneEl.appendChild(PriceOneEl);
 
@@ -231,7 +229,7 @@ function createTicketCard(countCard, ticket) {
     dataPriceTotalEl.style = "text-align:center";
     rowEl.appendChild(dataPriceTotalEl);
     let PriceTotalEl = document.createElement("h5");
-    PriceTotalEl.innerHTML = ticket.JoPackPrice.toFixed(2) + "€";
+    PriceTotalEl.textContent = (ticket.JoPackPrice * nb).toFixed(2) + "€";
     PriceTotalEl.style = "margin:0";
     dataPriceTotalEl.appendChild(PriceTotalEl);
 
@@ -242,4 +240,15 @@ function FormatDate(myDate) {
     const utcDate = new Date(myDate);
 
     return utcDate.toUTCString();
+}
+
+// function to count the number of ticket 'ticket' is in 'cart'
+function countSameTicket(ticket, cart) {
+    countSameticket = 0;
+    cart.forEach((t) => {
+        if (JSON.stringify(t) === JSON.stringify(ticket)) {
+            ++countSameticket;
+        }
+    });
+    return countSameticket;
 }
