@@ -154,7 +154,6 @@ async function PostToController(url, data) {
 
 // function to create a new line for a ticket in shopping cart
 // TODO : bug : countCard always set to 2
-// TODO : improve format date
 function createTicketCard(countCard, ticket) {
     let container = document.getElementById("shoppingCartTableBody");
 
@@ -188,7 +187,7 @@ function createTicketCard(countCard, ticket) {
     SessionNameEl.style = "margin:0";
     dataDescDiv.appendChild(SessionNameEl);
     let SessionDetailsEl = document.createElement("p");
-    SessionDetailsEl.innerHTML = ticket.JoSessionPlace + "<br>" + ticket.JoSessionDate + "<br>" + ticket.JoTicketPackName + " (" + ticket.NbAttendees + " attendees)";
+    SessionDetailsEl.innerHTML = ticket.JoSessionPlace + "<br>" + FormatDate(ticket.JoSessionDate) + "<br>" + ticket.JoTicketPackName + " (" + ticket.NbAttendees + " attendees)";
     SessionDetailsEl.style = "margin:0";
     dataDescDiv.appendChild(SessionDetailsEl);
 
@@ -240,4 +239,10 @@ function createTicketCard(countCard, ticket) {
     dataPriceTotalEl.appendChild(PriceTotalEl);
 
     return rowEl.id;
+}
+
+function FormatDate(myDate) {
+    const utcDate = new Date(myDate);
+
+    return utcDate.toUTCString();
 }
