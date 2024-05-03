@@ -91,6 +91,9 @@ function displayShoppingCart() {
         return;
     }
     else {
+        // sort tickets by joSession and then by joTicketPack
+        shoppingCartCookie.sort((a, b) => a.joSessionId - b.joSessionId ||
+            a.joTicketPackId - b.joTicketPackId);
 
         // display tickets 
         let lastTicket = {
