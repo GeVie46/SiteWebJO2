@@ -1,9 +1,4 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
-
-
+﻿
 // add a ticket to ShoppingCart
 // store each ticket as an object in an array in json format, and save in a cookie
 function addTicket(joTicketPackId, joSessionId) {
@@ -87,15 +82,13 @@ function displayShoppingCart() {
     // if nothing in shopping cart, display "nothing in cart still"
     if (shoppingCartCookie.length == 0) {
         document.getElementById("shoppingCartTable").hidden = true;
+        document.getElementById("subtotal").hidden = true;
         var msg = document.createElement("span");
         msg.textContent = "Nothing in cart still";
         document.getElementById("shoppingCartTablePosition").appendChild(msg);
         return;
     }
     else {
-        // sort tickets by joSession and then by joTicketPack
-        shoppingCartCookie.sort((a, b) => a.joSessionId - b.joSessionId ||
-            a.joTicketPackId - b.joTicketPackId);
 
         // display tickets 
         let lastTicket = {
@@ -103,25 +96,36 @@ function displayShoppingCart() {
             'joSessionId': -1
         };
         let countLine = 0;
+        let subtotal = 0;
+        let promiseArray = [];
         shoppingCartCookie.forEach((t) => {
             if (JSON.stringify(t) != JSON.stringify(lastTicket)) {
 
                 // ticket not already exists => add a new line
 
                 // get data of joSession and joTicketPack
-                PostToController("/ShoppingCarts/GetTicketData", t)
-                    .then((donnees) => {
-                        //create line in shopping cart
-                        let nb = countSameTicket(t, shoppingCartCookie);
-                        createTicketCard(countLine, donnees, nb); 
-                        ++countLine;
-                        console.log(countLine);
-                    });
-
+                promiseArray.push(
+                    PostToController("/ShoppingCarts/GetTicketData", t)
+                        .then((donnees) => {
+                            //create line in shopping cart
+                            let nb = countSameTicket(t, shoppingCartCookie);
+                            subtotal = subtotal + createTicketCard(countLine, donnees, nb);
+                            ++countLine;
+                            console.log(countLine);
+                        })
+                    );
             }
             lastTicket = t;
         });
-        console.log(shoppingCartCookie);
+
+        // display subtotal when all promises done
+        Promise.all(promiseArray)
+            .then(() => {
+                let container = document.getElementById("subtotal");
+                container.innerHTML = "<h5>Subtotal <small>(VAT incl.)</small> " + subtotal.toFixed(2) + "€</h5>";
+            })
+            .catch(err => console.log('error, not all promises createTicketCard finished', err)); 
+
     }
 }
 
@@ -193,7 +197,7 @@ function createTicketCard(countCard, ticket, nb) {
     rowEl.appendChild(dataButtonEl);
     let BtnEl = document.createElement("button");
     BtnEl.style = "background-color:white";
-    BtnEl.className = "btn dropdown-toggle";
+    BtnEl.className = "btn dropdown-toggle btn-outline-secondary NbTicketButton";
     BtnEl.type = "button";
     BtnEl.id = "NbTicketButton" + countCard;
     //BtnEl.setAttribute("id", "NbTicketButton" + countCard);
@@ -229,13 +233,15 @@ function createTicketCard(countCard, ticket, nb) {
     dataPriceTotalEl.style = "text-align:center";
     rowEl.appendChild(dataPriceTotalEl);
     let PriceTotalEl = document.createElement("h5");
-    PriceTotalEl.textContent = (ticket.JoPackPrice * nb).toFixed(2) + "€";
+    let priceTotal = ticket.JoPackPrice * nb;
+    PriceTotalEl.textContent = priceTotal.toFixed(2) + "€";
     PriceTotalEl.style = "margin:0";
     dataPriceTotalEl.appendChild(PriceTotalEl);
 
-    return rowEl.id;
+    return priceTotal;
 }
 
+// function to format the date to display it in html code
 function FormatDate(myDate) {
     const utcDate = new Date(myDate);
 

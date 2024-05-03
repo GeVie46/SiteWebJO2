@@ -1,3 +1,4 @@
+/* colors of site */
 :root {
     --blue: #00A0FE;
     --red: #F61732;
@@ -135,7 +136,7 @@ body {
     
 }
 
-    /*Specific css for table input view "JoSessions/Index"*/
+/*Specific css for table input view "JoSessions/Index"*/
 #ticketsTable {
     border-collapse: separate;
     border-spacing: 0 10px;
@@ -143,12 +144,12 @@ body {
     margin-bottom: 0px;
 }
 
-    #ticketsTable tr {
-        outline: thin solid;
-        outline-color: var(--blue);
-        border-radius: 10px;
-        box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
-    }
+#ticketsTable tr {
+    outline: thin solid;
+    outline-color: var(--blue);
+    border-radius: 10px;
+    box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+}
 
 .ticketsRow:hover {
     background-color: azure;
@@ -185,11 +186,11 @@ padding-top: 0px;
     margin-right: 10px;
 }
 
-    .cardOffers:hover {
-        background-color: azure;
-        cursor: pointer;
-        color: var(--blue);
-    }
+.cardOffers:hover {
+    background-color: azure;
+    cursor: pointer;
+    color: var(--blue);
+}
 
 /*Specific css for Views "Manage/Account/... "*/
 #profile {
@@ -227,6 +228,8 @@ padding-top: 0px;
     color: white;
 }
 
+/*Specific css for View "ShoppingCarts"*/
+
 #shoppingCartTable {
     border-collapse: separate;
     border-spacing: 0 10px;
@@ -234,9 +237,13 @@ padding-top: 0px;
     margin-bottom: 0px;
 }
 
-    #shoppingCartTable tr {
-        outline: thin solid;
-        outline-color: var(--blue);
-        border-radius: 10px;
-        box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
-    }
+#shoppingCartTable tr {
+    outline: thin solid;
+    outline-color: var(--blue);
+    border-radius: 10px;
+    box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+}
+
+.NbTicketButton{
+box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
+}

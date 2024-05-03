@@ -29,12 +29,19 @@
             </tr>
         </thead>
         <tbody id="shoppingCartTableBody">
+            //display the tickets selected by user, written by javascript
         </tbody>
     </table>
 </div>
-<div class="p-3">
-    <a asp-area="" asp-controller="JoSessions" asp-action="Index">Back to List</a>
+<div class="row d-inline-flex container">
+    <div scope="col" class="col-6 text-start">
+        <a asp-area="" asp-controller="JoSessions" asp-action="Index">Back to List</a>
+    </div>
+    <div scope="col" class="col-6 text-end d-inline" id="subtotal">
+        //display the shopping cart subtotal, written by javascript
+    </div>
 </div>
+
 
 <script>
     window.onload = function() {
