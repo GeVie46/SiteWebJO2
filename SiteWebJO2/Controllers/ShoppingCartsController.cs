@@ -27,7 +27,12 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
-      
+        public IActionResult Checkout()
+        {
+            return View();
+        }
+
+
         public string GetTicketData([FromBody] JoTicketSimplified joTicketSimplified) {
 
             //get data of joSession

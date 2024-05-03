@@ -84,8 +84,9 @@ function displayShoppingCart() {
         document.getElementById("shoppingCartTable").hidden = true;
         document.getElementById("subtotal").hidden = true;
         document.getElementById("ContinueToPayment").hidden = true;
-        var msg = document.createElement("span");
-        msg.textContent = "Nothing in cart still";
+        var msg = document.createElement("h6");
+        msg.className = "text-center mt-4 mb-4";
+        msg.innerHTML = "<i>Nothing in cart yet</i>";
         document.getElementById("shoppingCartTablePosition").appendChild(msg);
         return;
     }
