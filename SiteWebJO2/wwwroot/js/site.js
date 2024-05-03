@@ -83,6 +83,7 @@ function displayShoppingCart() {
     if (shoppingCartCookie.length == 0) {
         document.getElementById("shoppingCartTable").hidden = true;
         document.getElementById("subtotal").hidden = true;
+        document.getElementById("ContinueToPayment").hidden = true;
         var msg = document.createElement("span");
         msg.textContent = "Nothing in cart still";
         document.getElementById("shoppingCartTablePosition").appendChild(msg);
@@ -122,7 +123,7 @@ function displayShoppingCart() {
         Promise.all(promiseArray)
             .then(() => {
                 let container = document.getElementById("subtotal");
-                container.innerHTML = "<h5>Subtotal <small>(VAT incl.)</small> " + subtotal.toFixed(2) + "€</h5>";
+                container.innerHTML = "Subtotal <small>(VAT incl.)</small> " + subtotal.toFixed(2) + "€";
             })
             .catch(err => console.log('error, not all promises createTicketCard finished', err)); 
 

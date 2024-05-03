@@ -29,7 +29,7 @@
             </tr>
         </thead>
         <tbody id="shoppingCartTableBody">
-            //display the tickets selected by user, written by javascript
+            @* display the tickets selected by user, written by javascript *@
         </tbody>
     </table>
 </div>
@@ -37,8 +37,11 @@
     <div scope="col" class="col-6 text-start">
         <a asp-area="" asp-controller="JoSessions" asp-action="Index">Back to List</a>
     </div>
-    <div scope="col" class="col-6 text-end d-inline" id="subtotal">
-        //display the shopping cart subtotal, written by javascript
+    <div scope="col" class="col-6 text-end d-inline">
+        <h5 id="subtotal">
+            @* display the shopping cart subtotal, written by javascript *@
+        </h5>
+        <button id="ContinueToPayment" type="submit" class="btn btn-lg mb-3 mt-3 letsgoBtn">Continue to payment</button>
     </div>
 </div>
 

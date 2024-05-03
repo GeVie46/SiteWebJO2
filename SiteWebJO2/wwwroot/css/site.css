@@ -55,11 +55,20 @@ body {
 
 .btn:hover {
     font-weight: bold;
+    outline-width: 4px;  
 }
+
+.btn-outline-secondary.dropdown-toggle.show {
+    color: #6c757d;
+}
+.btn-outline-secondary:hover {
+    color: #6c757d;
+}
+
 
 .logoJO {
     max-width: 50%;
-    object-fit:contain;
+    object-fit: contain;
 }
 
 .logoParis {
