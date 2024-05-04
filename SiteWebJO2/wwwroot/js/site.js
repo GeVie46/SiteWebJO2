@@ -40,6 +40,7 @@ function addTicket(joTicketPackId, joSessionId) {
     myModalElement.show();
 }
 
+
 //returns the value of a specified cookie
 //param : cname : the name of the cookie searched
 //code adapted from https://www.w3schools.com/js/js_cookies.asp
@@ -60,16 +61,21 @@ function getCookie(cname) {
     return [];
 }
 
+
 // custom display of bootstrap modal
 // modal template defined in Layout.cshtml
 function customModal(title, text) {
-    
+    // modal to inform user
     document.getElementById("MsgModalTitle").textContent = title;
     document.getElementById("MsgModalText").textContent = text;
+    document.getElementById("closeModalButton").textContent = "Close";
+    document.getElementById("confirmModalButton").hidden=true;
     const myModal = document.getElementById("MsgModal");
     const myModalElement = new bootstrap.Modal(myModal);
+
     return myModalElement;
 }
+
 
 
 // display tickets selected in the shopping cart page
@@ -79,7 +85,7 @@ function displayShoppingCart() {
     let shoppingCartCookie = getCookie("jo2024Cart");
     console.log(shoppingCartCookie);
 
-    // if nothing in shopping cart, display "nothing in cart still"
+    // if nothing in shopping cart, display "nothing in cart yet"
     if (shoppingCartCookie.length == 0) {
         document.getElementById("shoppingCartTable").hidden = true;
         document.getElementById("subtotal").hidden = true;
@@ -156,7 +162,6 @@ async function PostToController(url, data) {
 }
 
 
-
 // function to create a new line for a ticket in shopping cart
 function createTicketCard(countCard, ticket, nb) {
     let container = document.getElementById("shoppingCartTableBody");
@@ -217,7 +222,7 @@ function createTicketCard(countCard, ticket, nb) {
         let BtnListEl = document.createElement("li");
         let BtnListLink = document.createElement("a");
         BtnListLink.className = "dropdown-item";
-        BtnListLink.href = "javascript:changeTicketNumber(" + i + ", " + ticket.JoSessionId + ", " + ticket.JoTicketPackId + ", " + countCard + ")";
+        BtnListLink.href = "javascript:checkChangeTicketNumber(" + i + ", " + ticket.JoSessionId + ", " + ticket.JoTicketPackId + ")";
         BtnListLink.textContent = i;
         BtnListEl.appendChild(BtnListLink);
         BtnList.appendChild(BtnListEl);
@@ -253,7 +258,7 @@ function FormatDate(myDate) {
     return utcDate.toUTCString();
 }
 
-// function to count the number of ticket 'ticket' is in 'cart'
+// function to count the number of a ticket in shopping cart
 function countSameTicket(ticket, cart) {
     countSameticket = 0;
     cart.forEach((t) => {
@@ -265,8 +270,9 @@ function countSameTicket(ticket, cart) {
 }
 
 
-// function to change number of tickets in shopping cart
-function changeTicketNumber(nb, joSessionId, joTicketPackId, countCard) {
+// function to check change number of tickets in shopping cart
+// called when user click on Nb ticket button
+function checkChangeTicketNumber(nb, joSessionId, joTicketPackId) {
     const ticket = {
         'joTicketPackId': joTicketPackId,
         'joSessionId': joSessionId
@@ -278,36 +284,78 @@ function changeTicketNumber(nb, joSessionId, joTicketPackId, countCard) {
     const nbInCookies = countSameTicket(ticket, shoppingCartCookie);
 
     if (nb == nbInCookies) {
-        // nb not changed
+        // nb not changed, do nothing
         return;
     }
     else {
         if (nb == 0) {
-            // ask for confirmation if ticket deletion
+            // ask for confirmation if ticket deletion : create a modal
+            const myModal = document.getElementById("MsgModal");
+            document.getElementById("MsgModalTitle").textContent = "Ticket delete";
+            document.getElementById("MsgModalText").textContent = "You're about to delete the ticket, please confirm";
+            //include ticket data in modal
+            let ticketData = document.getElementById("joSessionId") ?? document.createElement("input");
+            ticketData.type = "hidden";
+            ticketData.id = "joSessionId";
+            ticketData.value = joSessionId;
+            myModal.appendChild(ticketData);
+            let packData = document.getElementById("joTicketPackId") ??document.createElement("input");
+            packData.type = "hidden";
+            packData.id = "joTicketPackId";
+            packData.value = joTicketPackId;
+            myModal.appendChild(packData);
+            document.getElementById("confirmModalButton").removeAttribute('hidden');
+            document.getElementById("closeModalButton").textContent = "Cancel";
+            // to remove last event listener
+            var old_element = document.getElementById("confirmModalButton");
+            var new_element = old_element.cloneNode(true);
+            old_element.parentNode.replaceChild(new_element, old_element);
 
+            const myModalElement = new bootstrap.Modal(myModal);
+            
+            myModalElement.show();
 
+            document.getElementById("confirmModalButton").addEventListener('click', function (e) {
+                var myModalEl = document.getElementById('MsgModal');
+                var modal = bootstrap.Modal.getInstance(myModalEl)
+                modal.hide();
+                changeTicketNumber(0, document.getElementById("joSessionId").value, document.getElementById("joTicketPackId").value);
+            });
+            
 
-            //TODO
-
-
-
-        };
-        // remove all specified tickets from shopping cart
-        shoppingCartCookie = shoppingCartCookie.filter((t) => JSON.stringify(t) != JSON.stringify(ticket));
-
-        // add numbers of tickets
-        for (i = 1; i <= nb; i++) {
-            shoppingCartCookie.push(ticket);
         }
+        else {
+            changeTicketNumber(nb, joSessionId, joTicketPackId);
+        }
+    }
+}
 
-        //refresh cookie
-        //cookie expires in 1 hour, so if the user doesnt pass order too quick he must select again the session and we can check if tickets are still available
-        let DateExp = new Date();
-        DateExp.setHours(DateExp.getHours() + 1);
-        //overwrite the cookie
-        document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
 
+// function to change number of tickets in shopping cart
+// if remove of ticket, happens after user confirm
+function changeTicketNumber(nb, joSessionId, joTicketPackId) {
+    const ticket = {
+        'joTicketPackId': parseInt(joTicketPackId),
+        'joSessionId': parseInt(joSessionId)
     };
+
+    //get the shoppingCart cookie string (array of ticket)
+    let shoppingCartCookie = getCookie("jo2024Cart");
+
+    // remove all specified tickets from shopping cart
+    shoppingCartCookie = getCookie("jo2024Cart").filter((t) => JSON.stringify(t) != JSON.stringify(ticket));
+
+    // add numbers of tickets
+    for (i = 0; i < nb; i++) {
+        shoppingCartCookie.push(ticket);
+    }
+
+    //refresh cookie
+    //cookie expires in 1 hour, so if the user doesnt pass order too quick he must select again the session and we can check if tickets are still available
+    let DateExp = new Date();
+    DateExp.setHours(DateExp.getHours() + 1);
+    //overwrite the cookie
+    document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
 
     //refresh display of shopping cart : remove all table and recreate new one
     let container = document.getElementById("shoppingCartTableBody");
@@ -317,7 +365,7 @@ function changeTicketNumber(nb, joSessionId, joTicketPackId, countCard) {
     displayShoppingCart();
 
     //msg to confirm change
-    var myModalElement = customModal("Shopping cart change", "The number of ticket had been changed from " + nbInCookies + " to " + nb);
+    var myModalElement = customModal("Shopping cart change", "The number of ticket had been changed to " + nb);
     myModalElement.show();
-    
+
 }

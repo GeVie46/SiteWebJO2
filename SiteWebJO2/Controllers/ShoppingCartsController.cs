@@ -32,7 +32,7 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
-
+        [HttpPost]
         public string GetTicketData([FromBody] JoTicketSimplified joTicketSimplified) {
 
             //get data of joSession
@@ -55,8 +55,6 @@ namespace SiteWebJO2.Controllers
             {
                 throw new InvalidOperationException("Error during ticket data request");
             }
-
-            //return JsonSerializer.Serialize(new { Name = joTicketSimplified.joTicketPackId, DateTime = DateTime.Now.ToShortDateString() });
         }
     }
 
