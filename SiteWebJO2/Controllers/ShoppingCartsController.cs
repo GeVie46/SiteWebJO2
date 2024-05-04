@@ -4,6 +4,7 @@ using SiteWebJO2.Data;
 using SiteWebJO2.Models;
 using System.Text.Json;
 
+
 namespace SiteWebJO2.Controllers
 {
 
@@ -12,6 +13,7 @@ namespace SiteWebJO2.Controllers
      * access only for authentified users
      */
     [Authorize]
+    [AutoValidateAntiforgeryToken]
     public class ShoppingCartsController : Controller
     {
         private readonly ApplicationDbContext _applicationDbContext;

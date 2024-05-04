@@ -1,9 +1,14 @@
 ﻿@model SiteWebJO2.Models.ShoppingCartTicket
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@* https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery?view=aspnetcore-8.0 *@
 
 @{
     ViewData["Title"] = "Your shopping cart";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
+
+<input id="RequestVerificationToken" type="hidden" value="@requestToken" />
 
 <div class="d-inline-flex mb-3 container justify-content-center">
     <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
