@@ -36,6 +36,13 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
+
+        //Payment view
+        public IActionResult Payment()
+        {
+            return View();
+        }
+
         [HttpPost]
         public string GetTicketData([FromBody] JoTicketSimplified joTicketSimplified) {
 

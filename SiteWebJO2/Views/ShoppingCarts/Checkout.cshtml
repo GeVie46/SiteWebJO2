@@ -61,7 +61,7 @@
         </div>
 
         <div class=" text-end">
-            <a id="GoToPayment" class="btn btn-lg mb-3 mt-3 letsgoBtn" asp-area="" asp-controller="" asp-action="">Go to payment</a>
+            <a id="GoToPayment" class="btn btn-lg mb-3 mt-3 letsgoBtn" onclick="checkConditionsTicked();">Go to payment</a>
             <p>After this step, you will be redirected to the secure payment page to choose and enter your payment details</p>
         </div>
 
@@ -76,4 +76,17 @@
     window.onload = function () {
         displayCheckoutPage()
     };
+
+
+    // check that conditions are accepted by user before continue to payment
+    function checkConditionsTicked() {
+        if (!document.getElementById("flexCheckDefault").checked) {
+            var myModalElement = customModal("Can not continue", "You must check conditions and policy rules before go on to payment");
+            myModalElement.show();
+        }
+        else {
+            window.location.href = '/ShoppingCarts/Payment';
+        }
+
+    }
 </script>

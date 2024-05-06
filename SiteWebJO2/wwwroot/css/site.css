@@ -261,7 +261,7 @@ box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
 
 .joCard {
     margin: 14px 10px;
-    padding: 7px 10px;
+    padding: 1rem 1rem;
     border-collapse: separate;
     margin-bottom: 1rem;
 }
