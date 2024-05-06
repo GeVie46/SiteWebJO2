@@ -24,11 +24,13 @@ namespace SiteWebJO2.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
+        //shopping cart view
         public IActionResult Index()
         {
             return View();
         }
 
+        //Order checkout view
         public IActionResult Checkout()
         {
             return View();

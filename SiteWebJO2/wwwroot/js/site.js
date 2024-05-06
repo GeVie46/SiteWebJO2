@@ -371,3 +371,106 @@ function changeTicketNumber(nb, joSessionId, joTicketPackId) {
     myModalElement.show();
 
 }
+
+
+// display tickets selected in the checkout page
+// using data in cookie "jo2024Cart"
+function displayCheckoutPage() {
+    //get the shoppingCart cookie string (array of ticket)
+    let shoppingCartCookie = getCookie("jo2024Cart");
+    console.log(shoppingCartCookie);
+
+    // sort tickets by joSession and then by joTicketPack
+    shoppingCartCookie.sort((a, b) => a.joSessionId - b.joSessionId ||
+        a.joTicketPackId - b.joTicketPackId);
+
+    // display tickets 
+    let lastTicket = {
+        'joTicketPackId': -1,
+        'joSessionId': -1
+    };
+    let countLine = 0;
+    let subtotal = 0;
+    let promiseArray = [];
+    shoppingCartCookie.forEach((t) => {
+        if (JSON.stringify(t) != JSON.stringify(lastTicket)) {
+
+            // ticket not already exists => add a new line
+
+            // get data of joSession and joTicketPack
+            promiseArray.push(
+                PostToController("/ShoppingCarts/GetTicketData", t)
+                    .then((donnees) => {
+                        //create line in shopping cart
+                        let nb = countSameTicket(t, shoppingCartCookie);
+                        subtotal = subtotal + createCheckoutTicketCard(countLine, donnees, nb);
+                        ++countLine;
+                        console.log(countLine);
+                    })
+            );
+        }
+        lastTicket = t;
+    });
+
+    // display subtotal when all promises done
+    Promise.all(promiseArray)
+        .then(() => {
+            let container = document.getElementById("subtotal");
+            container.innerHTML = "Subtotal <small>(VAT incl.)</small> " + subtotal.toFixed(2) + "€";
+        })
+        .catch(err => console.log('error, not all promises createCheckoutTicketCard finished', err));
+
+    // add user name
+    let name = document.getElementById("namesUser");
+    name.textContent = document.getElementById("namelogged").textContent;
+}
+
+
+// function to create a new line for a ticket in checkout
+function createCheckoutTicketCard(countCard, ticket, nb) {
+    let container = document.getElementById("checkoutTableBody");
+
+    // create HTML card
+    // create row
+    let rowEl = document.createElement("tr");
+    rowEl.id = "card" + countCard;
+    container.appendChild(rowEl);
+    // create row header
+    let headerEl = document.createElement("th");
+    headerEl.scope = "row";
+    headerEl.className = "d-none";
+    headerEl.textContent = JSON.stringify(ticket);
+    rowEl.appendChild(headerEl);
+
+    // create element for number of tickets
+    let nbTicketsEl = document.createElement("td");
+    nbTicketsEl.style = "text-align:center";
+    nbTicketsEl.id = "NbTicket" + countCard;
+    nbTicketsEl.textContent = nb + " x";
+    rowEl.appendChild(nbTicketsEl);
+
+    // create element description session
+    let dataDescDiv = document.createElement("td");
+    rowEl.appendChild(dataDescDiv);
+    let SessionNameEl = document.createElement("h5");
+    SessionNameEl.textContent = ticket.JoSessionName;
+    SessionNameEl.style = "margin:0";
+    dataDescDiv.appendChild(SessionNameEl);
+    let SessionDetailsEl = document.createElement("p");
+    SessionDetailsEl.innerHTML = ticket.JoSessionPlace + "<br>" + FormatDate(ticket.JoSessionDate) + "<br>" + ticket.JoTicketPackName + " (" + ticket.NbAttendees + " attendees)";
+    SessionDetailsEl.style = "margin:0";
+    dataDescDiv.appendChild(SessionDetailsEl);
+
+    // create element total price
+    let dataPriceTotalEl = document.createElement("td");
+    dataPriceTotalEl.style = "text-align:center";
+    rowEl.appendChild(dataPriceTotalEl);
+    let PriceTotalEl = document.createElement("h5");
+    let priceTotal = ticket.JoPackPrice * nb;
+    PriceTotalEl.id = "totalPrice" + countCard;
+    PriceTotalEl.textContent = priceTotal.toFixed(2) + "€";
+    PriceTotalEl.style = "margin:0";
+    dataPriceTotalEl.appendChild(PriceTotalEl);
+
+    return priceTotal;
+}

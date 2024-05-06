@@ -17,7 +17,7 @@
 
     //display menu with authentified user
     <li class="nav-item">
-        <a class="nav-link text-capitalize text-end menu" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage account">@user.Name @user.Lastname</a>
+            <a class="nav-link text-capitalize text-end menu" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage account" id="namelogged">@user.Name @user.Lastname</a>
     </li>
     <li class="nav-item">
             <a class="nav-link text-capitalize text-end menu" asp-area="" asp-controller="ShoppingCarts" asp-action="Index" title="Shopping cart">Shopping cart <i class="bi bi-cart"></i></a>

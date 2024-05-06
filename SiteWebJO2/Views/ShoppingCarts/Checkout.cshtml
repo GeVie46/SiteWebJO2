@@ -1,8 +1,79 @@
-﻿@{
+﻿
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@* https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery?view=aspnetcore-8.0 *@
+
+
+@{
     ViewData["Title"] = "Order checkout";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
+
+<input id="RequestVerificationToken" type="hidden" value="@requestToken" />
 
 <div class="d-inline-flex mb-3 container justify-content-center">
     <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
 </div>
+
+<div class="d-inline-flex container row">
+    <div class="col col-8" id="orderSummary">
+        <table class="table" id="checkoutTable">
+            <thead class="text-center text-light bgBlue">
+                <tr>
+                    <th scope="col" class="col-2"></th>
+                    <th scope="col" class="col-8">Summary</th>
+                    <th scope="col" class="col-2"></th>
+                </tr>
+            </thead>
+            <tbody id="checkoutTableBody">
+                @* display the tickets selected by user, written by javascript *@
+            </tbody>
+        </table>
+        @* display the order subtotal *@
+        <div class="row d-inline-flex container">
+            <div scope="col" class="col-6 text-start">
+                <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index">Change order</a>
+            </div>
+            <div scope="col" class="col-6 text-end d-inline">
+                <h5 id="subtotal" class="text-end d-inline">
+                </h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="col col-4" id="orderConditions">
+        @* display the order conditions *@
+        <div class="joCard">
+            <h5>Conditions</h5>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    I have read and accept the <a href="~/Home/TicketingTerms">Ticketing Terms and Conditions</a>. I have also read the <a href="~/Home/Privacy">Privacy Policy</a>.
+                </label>
+            </div>
+        </div>
+
+        @* display the name on tickets *@
+        <div class="joCard">
+            <h5>Name on ticket</h5>
+            <p id="namesUser" class="text-capitalize"</p>
+        </div>
+
+        <div class=" text-end">
+            <a id="GoToPayment" class="btn btn-lg mb-3 mt-3 letsgoBtn" asp-area="" asp-controller="" asp-action="">Go to payment</a>
+            <p>After this step, you will be redirected to the secure payment page to choose and enter your payment details</p>
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<script>
+    window.onload = function () {
+        displayCheckoutPage()
+    };
+</script>
