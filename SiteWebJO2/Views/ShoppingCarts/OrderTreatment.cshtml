@@ -1,25 +1,41 @@
 ﻿@model Order
 @{
-    ViewData["Title"] = "Order treatment";
+    ViewData["Title"] = "Order on treatment...";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="d-inline-flex mb-3 container justify-content-center">
-    <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
-</div>
 
-@if(@Model!=null){
-    <div class="d-inline-flex mb-3 container justify-content-center">
-        <h1>Payment success</h1>
+
+@if(@Model!=null)
+{
+    <div class="d-inline-flex mb-3 mt-3 container justify-content-center">
+        <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
     </div>
-    <h1>@Model.ApplicationUserId</h1>
+    
+    <div class="mb-5 mt-3">
+        <h1 class="text-center">Payment success</h1>
+        <h5 class="text-center">Transaction id #@Model.TransactionId</h5>
+    </div>
+    <div class="mb-3">
+        <p>You will receive a mail with your tickets and invoice <strong>#@Model.OrderId</strong> soon</p>
+        <p>Please present yourself to the event 2 hours before starting time with your(s) ticket(s)</p>
+        <p>QR code must be visible, and you must present an official ID card to justify your identity.</p>
+    </div>
+    <div scope="col" class="col-6 text-start">
+        <a asp-area="" asp-controller="Home" asp-action="Index">Back to Home</a>
+    </div>
 }
 else
 {
-    <div class="d-inline-flex mb-3 container justify-content-center">
-        <h1>Payment abort</h1>
+    <div class="mb-5 mt-5">
+        <h1 class="text-center">Payment abort</h1>
     </div>
-    <div scope="col" class="col-6 text-start">
-        <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index">Back to shopping cart</a>
+    <div>
+        <br />
+        <div scope="col" class="col-6 text-start">
+            <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index">Back to shopping cart</a>
+        </div>
     </div>
+    <br />
+
 }

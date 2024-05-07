@@ -35,6 +35,7 @@ namespace SiteWebJO2.Controllers
             _userManager = userManager;
         }
 
+
         //shopping cart view
         public IActionResult Index()
         {
@@ -44,6 +45,15 @@ namespace SiteWebJO2.Controllers
         //Order checkout view
         public IActionResult Checkout()
         {
+            try
+            {
+                string shoppingCart = GetCookieValue("jo2024Cart");
+                if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("Index", "ShoppingCarts", null);
+            }
             return View();
         }
 
@@ -53,21 +63,23 @@ namespace SiteWebJO2.Controllers
         public IActionResult Payment ()
         {
             //get shopping cart data
-            StringValues values;
-            HttpContext.Request.Headers.TryGetValue("Cookie", out values);
-            var cookies = values.ToString().Split(';').ToList();
-            var result = cookies.Select(c => new { Key = c.Split('=')[0].Trim(), Value = c.Split('=')[1].Trim() }).ToList();
-            string shoppingCart = result.FirstOrDefault(r => r.Key == "jo2024Cart").Value;
-
-            if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
-
+            string shoppingCart = "";
+            try
+            {
+                shoppingCart = GetCookieValue("jo2024Cart");
+                if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
+            }
+            catch (Exception)
+            {
+                return RedirectToAction("Index", "ShoppingCarts", null);
+            }
             // store shopping cart in a session value
             // to secure data from payment to database save
             HttpContext.Session.SetString("_TicketsInOrder", shoppingCart);
 
             //get data into tickets array
             JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(HttpContext.Session.GetString("_TicketsInOrder"));
-
+    
             // calculate subtotal from cookies
             decimal orderAmount = GetSubtotal(ticketsArray);
 
@@ -86,7 +98,6 @@ namespace SiteWebJO2.Controllers
         {
             if (status == "Success")
             {
-                
                 //payment done
                 
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -178,8 +189,8 @@ namespace SiteWebJO2.Controllers
                     decimal reductionRate = (from s in _applicationDbContext.JoTicketPacks
                                 where s.JoTicketPackId == ticket.JoTicketPackId
                                 select s.ReductionRate).FirstOrDefault();
-
-                    int nbTicket = countSameTicket(ticket, ticketsArray);
+                    
+                    int nbTicket = Utilities.Utilities.CountSameTicket(ticket, ticketsArray);
 
                     subtotal += JoSessionsController.GetJoTicketPackPrice(sessionPrice, nbAttendees, reductionRate) * nbTicket;
 
@@ -190,24 +201,23 @@ namespace SiteWebJO2.Controllers
             return subtotal;
         }
 
-        // function to count number of same ticket
-        // same function as javascript one
-        public int countSameTicket(JoTicketSimplified ticket, JoTicketSimplified[] cart)
-        {
-            int countSameticket = 0;
-            foreach (var t in cart)
-            {
-                if (JsonSerializer.Serialize(ticket) == JsonSerializer.Serialize(t)) {
-                    countSameticket++;
-                }
-            }
-            return countSameticket;
-        }
+        
 
         private JoTicket GenerateTicket(JoTicketSimplified ticket)
         {
             //TODO
             return new JoTicket();
+        }
+
+
+        // function to get a cookie value
+        public string GetCookieValue(string cookieName)
+        {
+            StringValues values;
+            HttpContext.Request.Headers.TryGetValue("Cookie", out values);
+            var cookies = values.ToString().Split(';').ToList();
+            var result = cookies.Select(c => new { Key = c.Split('=')[0].Trim(), Value = c.Split('=')[1].Trim() }).ToList();
+            return result.FirstOrDefault(r => r.Key == cookieName).Value;
         }
     }
 
