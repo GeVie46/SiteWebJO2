@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Http;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 
 
 namespace SiteWebJO2.Controllers
@@ -113,16 +115,21 @@ namespace SiteWebJO2.Controllers
                 List<JoTicket> joTicketArray = new List<JoTicket>();
                 foreach (var ticket in ticketsArray)
                 {
-                    joTicketArray.Add(GenerateTicket(ticket));
+                    // update NbTotalBooked for the sessions
+                    if (!UpdateSessionNbBooked(ticket))
+                    {
+                        return NotFound();
+                    }
+
+                    joTicketArray.Add(GenerateTicket(ticket, userId, order.OrderId));
+
                 }
 
-                //TODO
+                // generate invoice : TODO
 
-                // generate invoice
+                // send tickets and invoice to user email : TODO
 
-                // send tickets and invoice to user email
 
-                // update NbTotalBooked for the sessions
 
                 // empty shopping cart
                 HttpContext.Session.SetString("_TicketsInOrder", "");
@@ -202,11 +209,37 @@ namespace SiteWebJO2.Controllers
         }
 
         
-
-        private JoTicket GenerateTicket(JoTicketSimplified ticket)
+        private JoTicket GenerateTicket(JoTicketSimplified ticket, string userId, int orderId)
         {
             //TODO
             return new JoTicket();
+        }
+
+        // update JoSessionNbTotalBooked : substract nb of places on ticket
+        // return true if operation is well done
+        private bool UpdateSessionNbBooked(JoTicketSimplified ticket)
+        {
+            
+            try
+            {
+                // get nb of attendees for the pack
+                var nb = (from p in _applicationDbContext.JoTicketPacks
+                           where p.JoTicketPackId == ticket.JoTicketPackId
+                           select p.NbAttendees).FirstOrDefault();
+
+                // update nbTotalBooked in JoSessions
+                var joSessionToUpdate= _applicationDbContext.JoSessions.FirstOrDefault(s => s.JoSessionId == ticket.JoSessionId);
+                int newNbBooked = joSessionToUpdate.JoSessionNbTotalBooked - nb;
+                if (newNbBooked < 0)
+                {
+                    throw new Exception("joSessionToUpdate.JoSessionNbTotalBooked can not be <0");
+                }
+                joSessionToUpdate.JoSessionNbTotalBooked = newNbBooked;
+                _applicationDbContext.SaveChanges();
+                return true;
+
+            }
+            catch { return false; }
         }
 
 
