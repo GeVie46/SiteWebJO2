@@ -21,4 +21,5 @@ namespace SiteWebJO2.Models
         public ICollection<JoTicket> JoTickets { get; set; }
 
     }
+
 }

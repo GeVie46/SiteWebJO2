@@ -1,8 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Sockets;
 using System.Text.Json;
+using System.Text.Json.Nodes;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 namespace SiteWebJO2.Controllers
@@ -37,12 +43,36 @@ namespace SiteWebJO2.Controllers
         }
 
 
-        //Payment view
-        public IActionResult Payment()
+        // Prepare payment and call Payment API
+        [HttpGet]
+        public IActionResult Payment ()
         {
-            return View();
+            //get shopping cart data
+            StringValues values;
+            HttpContext.Request.Headers.TryGetValue("Cookie", out values);
+            var cookies = values.ToString().Split(';').ToList();
+            var result = cookies.Select(c => new { Key = c.Split('=')[0].Trim(), Value = c.Split('=')[1].Trim() }).ToList();
+            string shoppingCart = result.FirstOrDefault(r => r.Key == "jo2024Cart").Value;
+
+            if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
+
+            //get data into tickets array
+            JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(shoppingCart);
+
+            // calculate subtotal from cookies
+            decimal orderAmount = GetSubtotal(ticketsArray);
+
+            // get next orderId
+            var max = _applicationDbContext.Orders.DefaultIfEmpty().Max(r => r == null ? 0 : r.OrderId);
+            int orderId = max + 1;
+
+            // send data to payment API: OrderId, OrderAmount, ShopPrivateKey
+            // should be a POST request to a real Payment API
+            return RedirectToAction("PaymentProcess", "MockPayment", new { orderId = orderId, orderAmount = orderAmount, sitewebjoKey = Environment.GetEnvironmentVariable("ApiPaymentKey") });
         }
 
+
+        // create a ShoppingCartTicket based on a JoTicketSimplified
         [HttpPost]
         public string GetTicketData([FromBody] JoTicketSimplified joTicketSimplified) {
 
@@ -66,6 +96,56 @@ namespace SiteWebJO2.Controllers
             {
                 throw new InvalidOperationException("Error during ticket data request");
             }
+        }
+
+        // function to calculate order subtotal
+        public decimal GetSubtotal (JoTicketSimplified[] ticketsArray)
+        {
+            decimal subtotal = 0;
+
+            // sort tickets by joSession and then by joTicketPack
+            ticketsArray.OrderBy(x => x.JoSessionId).ThenBy(x => x.JoTicketPackId);
+
+            JoTicketSimplified lastTicket = new JoTicketSimplified(-1, -1);
+            foreach (var ticket in ticketsArray)
+            {
+                if (JsonSerializer.Serialize(ticket) != JsonSerializer.Serialize(lastTicket)) {
+
+                    //get data of JoSessionPrice
+                    decimal sessionPrice = (from s in _applicationDbContext.JoSessions
+                              where s.JoSessionId == ticket.JoSessionId
+                              select s.JoSessionPrice).FirstOrDefault();
+
+                    //get data of joTicketPack: NbAttendees and ReductionRate
+                    int nbAttendees = (from p in _applicationDbContext.JoTicketPacks
+                               where p.JoTicketPackId == ticket.JoTicketPackId
+                               select p.NbAttendees).FirstOrDefault();
+                    decimal reductionRate = (from s in _applicationDbContext.JoTicketPacks
+                                where s.JoTicketPackId == ticket.JoTicketPackId
+                                select s.ReductionRate).FirstOrDefault();
+
+                    int nbTicket = countSameTicket(ticket, ticketsArray);
+
+                    subtotal += JoSessionsController.GetJoTicketPackPrice(sessionPrice, nbAttendees, reductionRate) * nbTicket;
+
+                }
+            }
+
+            return subtotal;
+        }
+
+        // function to count number of same ticket
+        // same function as javascript one
+        public int countSameTicket(JoTicketSimplified ticket, JoTicketSimplified[] cart)
+        {
+            int countSameticket = 0;
+            foreach (var t in cart)
+            {
+                if (JsonSerializer.Serialize(ticket) == JsonSerializer.Serialize(t)) {
+                    countSameticket++;
+                }
+            }
+            return countSameticket;
         }
     }
 

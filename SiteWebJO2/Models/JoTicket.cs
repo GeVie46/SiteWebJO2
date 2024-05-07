@@ -29,10 +29,10 @@
     /*
      * Class used for sending cookie data from client side to server side
      */
-    public class JoTicketSimplified
+    public class JoTicketSimplified (int joTicketPackId, int joSessionId)
     {
-        public int JoTicketPackId { get; set; }
-        public int JoSessionId { get; set; }
+        public int JoTicketPackId { get; set; } = joTicketPackId;
+        public int JoSessionId { get; set; } = joSessionId;
 
     }
 

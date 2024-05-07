@@ -18,8 +18,8 @@ function addTicket(joTicketPackId, joSessionId) {
     console.log(`addTicket to Cart joTicketPackId: ${joTicketPackId}, joSessionId: ${joSessionId}`);
     //create object to store
     var ticket = {
-        'joTicketPackId': joTicketPackId,
-        'joSessionId': joSessionId
+        'JoTicketPackId': joTicketPackId,
+        'JoSessionId': joSessionId
     };
 
     //get the shoppingCart cookie string (array of ticket)
@@ -98,13 +98,13 @@ function displayShoppingCart() {
     }
     else {
         // sort tickets by joSession and then by joTicketPack
-        shoppingCartCookie.sort((a, b) => a.joSessionId - b.joSessionId ||
-            a.joTicketPackId - b.joTicketPackId);
+        shoppingCartCookie.sort((a, b) => a.JoSessionId - b.JoSessionId ||
+            a.JoTicketPackId - b.JoTicketPackId);
 
         // display tickets 
         let lastTicket = {
-            'joTicketPackId': -1,
-            'joSessionId': -1
+            'JoTicketPackId': -1,
+            'JoSessionId': -1
         };
         let countLine = 0;
         let subtotal = 0;
@@ -116,7 +116,7 @@ function displayShoppingCart() {
 
                 // get data of joSession and joTicketPack
                 promiseArray.push(
-                    PostToController("/ShoppingCarts/GetTicketData", t)
+                    PostToController("/ShoppingCarts/GetTicketData", JSON.stringify(t))
                         .then((donnees) => {
                             //create line in shopping cart
                             let nb = countSameTicket(t, shoppingCartCookie);
@@ -146,14 +146,13 @@ async function PostToController(url, data) {
     try {
         const reponse = await fetch(url, {
             method: "POST",
-            body: JSON.stringify(data),
+            body: data,
             headers: {
                 "Content-Type": "application/json",
                 RequestVerificationToken:
                     document.getElementById("RequestVerificationToken").value
             }
         });
-
         const resultat = await reponse.json();
         console.log("Fetch request done :", resultat);
         return resultat;
@@ -276,8 +275,8 @@ function countSameTicket(ticket, cart) {
 // called when user click on Nb ticket button
 function checkChangeTicketNumber(nb, joSessionId, joTicketPackId) {
     const ticket = {
-        'joTicketPackId': joTicketPackId,
-        'joSessionId': joSessionId
+        'JoTicketPackId': joTicketPackId,
+        'JoSessionId': joSessionId
     };
 
     //get the shoppingCart cookie string (array of ticket)
@@ -337,8 +336,8 @@ function checkChangeTicketNumber(nb, joSessionId, joTicketPackId) {
 // if remove of ticket, happens after user confirm
 function changeTicketNumber(nb, joSessionId, joTicketPackId) {
     const ticket = {
-        'joTicketPackId': parseInt(joTicketPackId),
-        'joSessionId': parseInt(joSessionId)
+        'JoTicketPackId': parseInt(joTicketPackId),
+        'JoSessionId': parseInt(joSessionId)
     };
 
     //get the shoppingCart cookie string (array of ticket)
@@ -382,12 +381,12 @@ function displayCheckoutPage() {
 
     // sort tickets by joSession and then by joTicketPack
     shoppingCartCookie.sort((a, b) => a.joSessionId - b.joSessionId ||
-        a.joTicketPackId - b.joTicketPackId);
+        a.JoTicketPackId - b.JoTicketPackId);
 
     // display tickets 
     let lastTicket = {
-        'joTicketPackId': -1,
-        'joSessionId': -1
+        'JoTicketPackId': -1,
+        'JoSessionId': -1
     };
     let countLine = 0;
     let subtotal = 0;
@@ -399,7 +398,7 @@ function displayCheckoutPage() {
 
             // get data of joSession and joTicketPack
             promiseArray.push(
-                PostToController("/ShoppingCarts/GetTicketData", t)
+                PostToController("/ShoppingCarts/GetTicketData", JSON.stringify(t))
                     .then((donnees) => {
                         //create line in shopping cart
                         let nb = countSameTicket(t, shoppingCartCookie);

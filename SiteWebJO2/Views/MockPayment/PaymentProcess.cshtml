@@ -1,0 +1,46 @@
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@* https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery?view=aspnetcore-8.0 *@
+
+@using SiteWebJO2.Controllers
+@model SiteWebJO2.Controllers.Transaction
+
+@{
+    ViewData["Title"] = "Payment";
+    Layout = null;
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
+}
+
+
+<input id="RequestVerificationToken" type="hidden" value="@requestToken" />
+
+<h1>Welcome to Stripe Payment</h1>
+
+<strong>Note: This is a fake site for educational purpose only</strong>
+
+<h3>Your payment from the site : @Model.ClientName</h3>
+
+<h3>Order Id: #@Model.OrderId</h3>
+
+<h3>Amount to pay: @Model.OrderAmount €</h3>
+
+@using (Html.BeginForm("PaymentOk", "MockPayment", FormMethod.Post))
+{
+    <input type="hidden" asp-for="TransactionId" value=@Model.TransactionId />
+    <input type="hidden" asp-for="OrderId" value=@Model.OrderId />
+    <input type="hidden" asp-for="OrderAmount" value=@Model.OrderAmount />
+    <input type="hidden" asp-for="ClientName" value=@Model.ClientName />
+    <input type="hidden" asp-for="Status" value=@Model.Status />
+    <button type="submit">Accept payment</button>
+
+}
+
+
+@using (Html.BeginForm("PaymentAbort", "MockPayment", FormMethod.Post))
+{
+    <input type="hidden" asp-for="TransactionId" value=@Model.TransactionId />
+    <input type="hidden" asp-for="OrderId" value=@Model.OrderId />
+    <input type="hidden" asp-for="OrderAmount" value=@Model.OrderAmount />
+    <input type="hidden" asp-for="ClientName" value=@Model.ClientName />
+    <input type="hidden" asp-for="Status" value=@Model.Status />
+    <button type="submit">Refuse payment</button>
+}
