@@ -62,10 +62,11 @@ namespace SiteWebJO2.Controllers
             if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
 
             // store shopping cart in a session value
+            // to secure data from payment to database save
             HttpContext.Session.SetString("_TicketsInOrder", shoppingCart);
 
             //get data into tickets array
-            JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(shoppingCart);
+            JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(HttpContext.Session.GetString("_TicketsInOrder"));
 
             // calculate subtotal from cookies
             decimal orderAmount = GetSubtotal(ticketsArray);
@@ -80,7 +81,6 @@ namespace SiteWebJO2.Controllers
         }
 
         // Payment API send response to this url
-
         [HttpGet]
         public IActionResult OrderTreatment(int orderId, decimal orderAmount, string transactionId, string status)
         {
@@ -90,13 +90,21 @@ namespace SiteWebJO2.Controllers
                 
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-                //generate order
+                //generate order and save in database
                 Order order = new Order(orderId, userId, DateTime.Now, status, orderAmount, transactionId);
+                _applicationDbContext.Orders.Add(order);
+                _applicationDbContext.SaveChanges();
 
                 // generate each ticket
                 var ticketsInOrder = HttpContext.Session.GetString("_TicketsInOrder");
                 JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(ticketsInOrder);
+                List<JoTicket> joTicketArray = new List<JoTicket>();
+                foreach (var ticket in ticketsArray)
+                {
+                    joTicketArray.Add(GenerateTicket(ticket));
+                }
 
+                //TODO
 
                 // generate invoice
 
@@ -191,6 +199,12 @@ namespace SiteWebJO2.Controllers
                 }
             }
             return countSameticket;
+        }
+
+        private JoTicket GenerateTicket(JoTicketSimplified ticket)
+        {
+            //TODO
+            return new JoTicket();
         }
     }
 

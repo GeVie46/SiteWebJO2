@@ -8,4 +8,11 @@
     <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
 </div>
 
-<h1>@Model.ApplicationUserId</h1>
+@if(@Model!=null){
+    <h1>Payment success</h1>
+    <h1>@Model.ApplicationUserId</h1>
+}
+else
+{
+    <h1>Payment abort</h1>
+}
