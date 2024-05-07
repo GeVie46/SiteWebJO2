@@ -86,6 +86,7 @@ namespace SiteWebJO2.Controllers
         {
             if (status == "Success")
             {
+                
                 //payment done
                 
                 var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -113,6 +114,8 @@ namespace SiteWebJO2.Controllers
                 // update NbTotalBooked for the sessions
 
                 // empty shopping cart
+                HttpContext.Session.SetString("_TicketsInOrder", "");
+                Response.Cookies.Delete("jo2024Cart");
 
                 return View(order);
             }

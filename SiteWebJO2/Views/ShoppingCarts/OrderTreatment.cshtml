@@ -9,10 +9,17 @@
 </div>
 
 @if(@Model!=null){
-    <h1>Payment success</h1>
+    <div class="d-inline-flex mb-3 container justify-content-center">
+        <h1>Payment success</h1>
+    </div>
     <h1>@Model.ApplicationUserId</h1>
 }
 else
 {
-    <h1>Payment abort</h1>
+    <div class="d-inline-flex mb-3 container justify-content-center">
+        <h1>Payment abort</h1>
+    </div>
+    <div scope="col" class="col-6 text-start">
+        <a asp-area="" asp-controller="ShoppingCarts" asp-action="Index">Back to shopping cart</a>
+    </div>
 }

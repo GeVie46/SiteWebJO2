@@ -84,6 +84,11 @@
             var myModalElement = customModal("Can not continue", "You must check conditions and policy rules before go on to payment");
             myModalElement.show();
         }
+        // check that shopping cart is not empty (possible to append when go on previous pages)
+        else if (getCookie("jo2024Cart") == []) {
+            var myModalElement = customModal("Can not continue", "Your shopping cart is empty");
+            myModalElement.show();
+        }
         else {
             window.location.href = '/ShoppingCarts/Payment';
         }
