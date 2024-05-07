@@ -8,7 +8,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Net.Sockets;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.AspNetCore.Http;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace SiteWebJO2.Controllers
@@ -23,11 +26,13 @@ namespace SiteWebJO2.Controllers
     public class ShoppingCartsController : Controller
     {
         private readonly ApplicationDbContext _applicationDbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         //constructor, with dependency injection of dbContext
-        public ShoppingCartsController(ApplicationDbContext applicationDbContext)
+        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
         {
             _applicationDbContext = applicationDbContext;
+            _userManager = userManager;
         }
 
         //shopping cart view
@@ -56,6 +61,9 @@ namespace SiteWebJO2.Controllers
 
             if (shoppingCart.IsNullOrEmpty()) { throw new Exception("Shopping Cart is empty"); };
 
+            // store shopping cart in a session value
+            HttpContext.Session.SetString("_TicketsInOrder", shoppingCart);
+
             //get data into tickets array
             JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(shoppingCart);
 
@@ -69,6 +77,42 @@ namespace SiteWebJO2.Controllers
             // send data to payment API: OrderId, OrderAmount, ShopPrivateKey
             // should be a POST request to a real Payment API
             return RedirectToAction("PaymentProcess", "MockPayment", new { orderId = orderId, orderAmount = orderAmount, sitewebjoKey = Environment.GetEnvironmentVariable("ApiPaymentKey") });
+        }
+
+        // Payment API send response to this url
+
+        [HttpGet]
+        public IActionResult OrderTreatment(int orderId, decimal orderAmount, string transactionId, string status)
+        {
+            if (status == "Success")
+            {
+                //payment done
+                
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                //generate order
+                Order order = new Order(orderId, userId, DateTime.Now, status, orderAmount, transactionId);
+
+                // generate each ticket
+                var ticketsInOrder = HttpContext.Session.GetString("_TicketsInOrder");
+                JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(ticketsInOrder);
+
+
+                // generate invoice
+
+                // send tickets and invoice to user email
+
+                // update NbTotalBooked for the sessions
+
+                // empty shopping cart
+
+                return View(order);
+            }
+            else
+            {
+                //payment not done
+                return View(null);
+            }
         }
 
 
@@ -129,6 +173,7 @@ namespace SiteWebJO2.Controllers
                     subtotal += JoSessionsController.GetJoTicketPackPrice(sessionPrice, nbAttendees, reductionRate) * nbTicket;
 
                 }
+                lastTicket = ticket;
             }
 
             return subtotal;

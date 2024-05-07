@@ -33,7 +33,7 @@ function addTicket(joTicketPackId, joSessionId) {
     DateExp.setHours(DateExp.getHours() + 1);
 
     //overwrite the cookie
-    document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
+    document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/; secure`;
 
     //inform user that ticket is added
     var myModalElement = customModal("Action done", "The ticket was added to your shopping cart");
@@ -356,7 +356,7 @@ function changeTicketNumber(nb, joSessionId, joTicketPackId) {
     let DateExp = new Date();
     DateExp.setHours(DateExp.getHours() + 1);
     //overwrite the cookie
-    document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/`;
+    document.cookie = `jo2024Cart=${JSON.stringify(shoppingCartCookie)}; expires=${DateExp.toUTCString()}; path=/; secure`;
 
     //refresh display of shopping cart : remove all table and recreate new one
     let container = document.getElementById("shoppingCartTableBody");

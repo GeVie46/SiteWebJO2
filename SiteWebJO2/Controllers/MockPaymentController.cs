@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using SiteWebJO2.Models;
 using System.Numerics;
 
 
@@ -33,15 +34,15 @@ namespace SiteWebJO2.Controllers
         public IActionResult PaymentOk(Transaction transaction)
         {
             transaction.Status = "Success";
-            return RedirectToAction("");
+            return RedirectToAction("OrderTreatment", "ShoppingCarts",  new { orderId = transaction.OrderId, orderAmount = transaction.OrderAmount, transactionId = transaction.TransactionId, status = transaction.Status});
         }
 
         // user pay abort, call client web site to inform
         [HttpPost]
-        public string PaymentAbort(Transaction transaction)
+        public IActionResult PaymentAbort(Transaction transaction)
         {
             transaction.Status = "Abort";
-            return "";
+            return RedirectToAction("OrderTreatment", "ShoppingCarts", new { orderId = transaction.OrderId, orderAmount = transaction.OrderAmount, transactionId = transaction.TransactionId, status = transaction.Status });
         }
     }
 
