@@ -94,7 +94,7 @@ namespace SiteWebJO2.Controllers
             return RedirectToAction("PaymentProcess", "MockPayment", new { orderId = orderId, orderAmount = orderAmount, sitewebjoKey = Environment.GetEnvironmentVariable("ApiPaymentKey") });
         }
 
-        // Payment API send response to this url
+        // Payment API sends response to this url
         [HttpGet]
         public IActionResult OrderTreatment(int orderId, decimal orderAmount, string transactionId, string status)
         {
