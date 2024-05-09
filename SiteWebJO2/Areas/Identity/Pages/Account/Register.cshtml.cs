@@ -143,7 +143,7 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
                 user.Lastname = Input.Lastname;
                 /* create userkey
                  */
-                user.Userkey = ApplicationUser.GenerateUserKey();
+                user.Userkey = Utilities.Utilities.GenerateSecureKey();
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

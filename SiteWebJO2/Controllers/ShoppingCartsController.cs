@@ -123,6 +123,8 @@ namespace SiteWebJO2.Controllers
 
                     joTicketArray.Add(GenerateTicket(ticket, userId, order.OrderId));
 
+                    // generate QR code
+
                 }
 
                 // generate invoice : TODO
@@ -209,9 +211,37 @@ namespace SiteWebJO2.Controllers
         }
 
         
+        // generate the ticket and save it in database
+        // include generate secured ticketKey
         private JoTicket GenerateTicket(JoTicketSimplified ticket, string userId, int orderId)
         {
-            //TODO
+            // generate TicketKey
+            byte[] ticketKey = Utilities.Utilities.GenerateSecureKey();
+
+            // get TicketPrice
+            JoSession joSession = (from s in _applicationDbContext.JoSessions
+                                   where s.JoSessionId == ticket.JoSessionId
+                                   select s).FirstOrDefault();
+            JoTicketPack joTicketPack = (from p in _applicationDbContext.JoTicketPacks
+                                   where p.JoTicketPackId == ticket.JoTicketPackId
+                                   select p).FirstOrDefault();
+            decimal ticketPrice = JoSessionsController.GetJoTicketPackPrice(joSession.JoSessionPrice, joTicketPack.NbAttendees, joTicketPack.ReductionRate);
+
+            // save ticket in database
+            // TicketStatus is set to true
+            JoTicket completeTicket = new JoTicket()
+            {
+                ApplicationUserId = userId,
+                JoTicketKey = ticketKey,
+                JoTicketPackId=ticket.JoTicketPackId,
+                JoSessionId = ticket.JoSessionId,
+                JoTicketStatus = true,
+                JoTicketPrice=ticketPrice,
+                OrderId = orderId
+            };
+            _applicationDbContext.JoTickets.Add(completeTicket);
+            _applicationDbContext.SaveChanges();
+
             return new JoTicket();
         }
 

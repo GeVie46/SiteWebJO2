@@ -27,16 +27,7 @@ namespace SiteWebJO2.Models
         public ICollection<Order> Orders { get; set; }
         public ICollection<JoTicket> JoTickets { get; set; }
 
-        /*
-         * method GenerateUserKey(): Generate a 128-bit salt using a sequence of cryptographically strong random bytes.
-         * code from
-         * https://learn.microsoft.com/fr-fr/aspnet/core/security/data-protection/consumer-apis/password-hashing?view=aspnetcore-8.0
-         */
-        public static byte[] GenerateUserKey()
-        {
-            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes
-            return salt;
-        }
+
     }
 
     
