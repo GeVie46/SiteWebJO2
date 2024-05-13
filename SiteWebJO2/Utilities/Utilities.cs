@@ -34,6 +34,12 @@ namespace SiteWebJO2.Utilities
             }
             return countSameticket;
         }
+
+        // function to put first letter in upper case
+        public static string CapitalizeFirstLetter (string text)
+        {
+            return Char.ToUpper(text[0]) + text.Substring(1);
+        }
         
 
     }

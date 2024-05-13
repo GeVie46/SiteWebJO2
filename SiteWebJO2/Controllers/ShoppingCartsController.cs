@@ -13,7 +13,19 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Reflection.Metadata.Ecma335;
+using System.Drawing;
+using System.Security.Cryptography;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+using SiteWebJO2.Utilities;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Text.Encodings.Web;
+using QRCoder;
 
 
 namespace SiteWebJO2.Controllers
@@ -29,12 +41,14 @@ namespace SiteWebJO2.Controllers
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IEmailSender _emailSender;
 
         //constructor, with dependency injection of dbContext
-        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager)
+        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
+            _emailSender = emailSender; // TODO : error in email config
         }
 
 
@@ -112,7 +126,7 @@ namespace SiteWebJO2.Controllers
                 // generate each ticket
                 var ticketsInOrder = HttpContext.Session.GetString("_TicketsInOrder");
                 JoTicketSimplified[] ticketsArray = JsonSerializer.Deserialize<JoTicketSimplified[]>(ticketsInOrder);
-                List<JoTicket> joTicketArray = new List<JoTicket>();
+                List<JoTicket> joTicketList = new List<JoTicket>();
                 foreach (var ticket in ticketsArray)
                 {
                     // update NbTotalBooked for the sessions
@@ -121,21 +135,32 @@ namespace SiteWebJO2.Controllers
                         return NotFound();
                     }
 
-                    joTicketArray.Add(GenerateTicket(ticket, userId, order.OrderId));
-
-                    // generate QR code
+                    // generate ticket
+                    joTicketList.Add(GenerateTicket(ticket, userId, order.OrderId));
 
                 }
+
+                // generate QR code
+                ApplicationUser user = (from u in _applicationDbContext.Users
+                                        where u.Id == userId
+                                        select u).FirstOrDefault();
+                List<byte[]> qrCodeList = new List<byte[]>();
+                qrCodeList = GenerateQrCode(joTicketList, user);
+
+                // generate ticket PDF
+                List<Document> ticketPDF = GenerateTicketPDF(joTicketList, user, qrCodeList);
 
                 // generate invoice : TODO
 
                 // send tickets and invoice to user email : TODO
+                if (SendOrderEmail(user, order, ticketPDF).Result)
+                {
+                    // empty shopping cart
+                    HttpContext.Session.SetString("_TicketsInOrder", "");
+                    Response.Cookies.Delete("jo2024Cart");
+                }
 
-
-
-                // empty shopping cart
-                HttpContext.Session.SetString("_TicketsInOrder", "");
-                Response.Cookies.Delete("jo2024Cart");
+                
 
                 return View(order);
             }
@@ -143,6 +168,24 @@ namespace SiteWebJO2.Controllers
             {
                 //payment not done
                 return View(null);
+            }
+        }
+
+        /*
+         *  Function to send email with tickets and order
+         */
+        public async Task<bool> SendOrderEmail(ApplicationUser user, Order order, List<Document> ticketPDF)
+        {
+            try
+            {
+                await _emailSender.SendEmailAsync(user.Email, "Order #" + order.OrderId, 
+                    "Hello " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) 
+                    + ", \r\n this email is sent following the order you've done on the jo2024Tickets.fly.dev website.");
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
@@ -242,8 +285,93 @@ namespace SiteWebJO2.Controllers
             _applicationDbContext.JoTickets.Add(completeTicket);
             _applicationDbContext.SaveChanges();
 
-            return new JoTicket();
+            return completeTicket;
         }
+
+        // generate the QRcode for all tickets
+        // using NuGet package QRCoder https://www.nuget.org/packages/QRCoder/
+        private List<byte[]> GenerateQrCode(List<JoTicket> joTicketList, ApplicationUser user)
+        {
+            // define licence for QuestPDF
+            QuestPDF.Settings.License = LicenseType.Community;
+
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+
+            List<byte[]> qrCodeList = new List<byte[]>();
+            string qrCodeStr;
+            byte[] userKey = user.Userkey;
+            foreach (var item in joTicketList)
+            {
+                // concatenate user key and ticket key
+                byte[] concatKeys = userKey.Concat(item.JoTicketKey).ToArray();
+
+                // hash concatenation, using SHA-256 hash algorithm, and convert to string
+                string hashValueStr = Convert.ToBase64String(SHA256.HashData(concatKeys));
+
+                // add user firstname and lastname
+                qrCodeStr = hashValueStr + ";Firstname:" + user.Name + ";Lastname:" + user.Lastname;
+
+                // create QR code
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
+                PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+                byte[] qrCodeImage = qrCode.GetGraphic(20);
+                qrCodeList.Add(qrCodeImage);
+            }
+
+            return qrCodeList;
+        }
+
+        // create a PDF for each ticket, containing ticket informations and QR code
+        private List<Document> GenerateTicketPDF(List<JoTicket> joTicketList, ApplicationUser user, List<byte[]> qrCodeList)
+        {
+            List<Document> ticketPDF = new List<Document>();
+            for (int i = 0; i < joTicketList.Count; i++)
+            {
+                JoTicket ticket = joTicketList[i];
+                // get Ticket data
+                JoSession joSession = (from s in _applicationDbContext.JoSessions
+                                       where s.JoSessionId == ticket.JoSessionId
+                                       select s).FirstOrDefault();
+                JoTicketPack joTicketPack = (from p in _applicationDbContext.JoTicketPacks
+                                             where p.JoTicketPackId == ticket.JoTicketPackId
+                                             select p).FirstOrDefault();
+
+                var pdf = Document.Create(container =>
+                    {
+                        container.Page(page =>
+                        {
+                            page.Margin(50);
+                            page.Size(PageSizes.A4);
+                            page.PageColor(Colors.White);
+                            page.DefaultTextStyle(x => x.FontSize(16));
+
+                            page.Header()
+                                .AlignCenter()
+                                .Text("Olympic Games 2024 PARIS")
+                                .SemiBold().FontSize(24).FontColor(Colors.Grey.Darken4);
+
+                            page.Content()
+                        .Column(x =>
+                        {
+                            x.Item().Text(text =>
+                            {
+                                text.Span("Session: " + joSession.JoSessionName);
+                                text.Span("Place: " + joSession.JoSessionPlace);
+                                text.Span("Date: " + joSession.JoSessionDate);
+                                text.Span("Pack: " + joTicketPack.JoTicketPackName + " (" + joTicketPack.NbAttendees + " attendees)");
+                                text.Span("Main attendee name: " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) );
+                            });
+                            x.Item().Image(qrCodeList[i]);
+                        });
+                        });
+                    });
+                pdf.GeneratePdf("ticket" + i + ".pdf");
+                ticketPDF.Add(pdf);
+            }
+
+            return ticketPDF;
+        }
+
 
         // update JoSessionNbTotalBooked : substract nb of places on ticket
         // return true if operation is well done
@@ -282,6 +410,7 @@ namespace SiteWebJO2.Controllers
             var result = cookies.Select(c => new { Key = c.Split('=')[0].Trim(), Value = c.Split('=')[1].Trim() }).ToList();
             return result.FirstOrDefault(r => r.Key == cookieName).Value;
         }
+
     }
 
 }

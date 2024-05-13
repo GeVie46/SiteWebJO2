@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using QuestPDF.Fluent;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -25,6 +26,15 @@ namespace SiteWebJO2.Services
 
         public AuthMessageSenderOptions Options { get; } //Set with Secret Manager.
 
+
+        /// <summary>
+        /// add API key to send email
+        /// </summary>
+        /// <param name="toEmail"></param>
+        /// <param name="subject"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
             if (string.IsNullOrEmpty(Options.SendGridKey))
@@ -34,16 +44,49 @@ namespace SiteWebJO2.Services
             await Execute(Options.SendGridKey, subject, message, toEmail);
         }
 
-        public async Task Execute(string apiKey, string subject, string message, string toEmail)
+        /// <summary>
+        /// add API key to send email with attachments
+        /// </summary>
+        /// <param name="toEmail"></param>
+        /// <param name="subject"></param>
+        /// <param name="message"></param>
+        /// <param name="attachments"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public async Task SendEmailAsync(string toEmail, string subject, string message, List<Document>? attachments = default)
+        {
+            if (string.IsNullOrEmpty(Options.SendGridKey))
+            {
+                throw new Exception("Null SendGridKey");
+            }
+            await Execute(Options.SendGridKey, subject, message, toEmail, attachments);
+        }
+
+
+        public async Task Execute(string apiKey, string subject, string message, string toEmail, List<Document>? attachments = default)
         {
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("gevie46000@gmail.com", "Password Recovery"),
+                From = new EmailAddress("gevie46000@gmail.com", "Jo2024Tickets.fly.dev"),
                 Subject = subject,
                 PlainTextContent = message,
                 HtmlContent = message
             };
+
+            // add attachements if needed
+            if (attachments != null)
+            {
+                foreach (var attachment in attachments)
+                {
+                    // TODO
+                    //var bytes = File.ReadAllBytes("~/Templates/output.pdf");
+                    //var file = Convert.ToBase64String(bytes);
+                    //msg.AddAttachment("ABC.pdf", file);
+                }
+            }
+            
+
             msg.AddTo(new EmailAddress(toEmail));
 
             // Disable click tracking.
