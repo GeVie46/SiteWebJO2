@@ -26,6 +26,11 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Text.Encodings.Web;
 using QRCoder;
+using Azure;
+using System.Net.Mail;
+using SiteWebJO2.Services;
+using Microsoft.Extensions.Options;
+using System.Numerics;
 
 
 namespace SiteWebJO2.Controllers
@@ -42,13 +47,16 @@ namespace SiteWebJO2.Controllers
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
+       
+        public AuthMessageSenderOptions Options { get; } //Set with Secret Manager.
 
         //constructor, with dependency injection of dbContext
-        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, IOptions<AuthMessageSenderOptions> optionsAccessor)
         {
             _applicationDbContext = applicationDbContext;
             _userManager = userManager;
-            _emailSender = emailSender; // TODO : error in email config
+            _env = environment; // to get wwwroot path
+            Options = optionsAccessor.Value;
         }
 
 
@@ -148,12 +156,14 @@ namespace SiteWebJO2.Controllers
                 qrCodeList = GenerateQrCode(joTicketList, user);
 
                 // generate ticket PDF
-                List<Document> ticketPDF = GenerateTicketPDF(joTicketList, user, qrCodeList);
+                List<string> ticketPDF = GenerateTicketPDF(joTicketList, user, qrCodeList);
 
                 // generate invoice : TODO
 
                 // send tickets and invoice to user email : TODO
-                if (SendOrderEmail(user, order, ticketPDF).Result)
+                SendGrid.Response response = SendOrderEmail(user, order, ticketPDF);
+                if (response.StatusCode.Equals(System.Net.HttpStatusCode.Accepted)
+                || response.StatusCode.Equals(System.Net.HttpStatusCode.OK))
                 {
                     // empty shopping cart
                     HttpContext.Session.SetString("_TicketsInOrder", "");
@@ -171,24 +181,63 @@ namespace SiteWebJO2.Controllers
             }
         }
 
-        /*
-         *  Function to send email with tickets and order
-         */
-        public async Task<bool> SendOrderEmail(ApplicationUser user, Order order, List<Document> ticketPDF)
-        {
-            try
-            {
-                await _emailSender.SendEmailAsync(user.Email, "Order #" + order.OrderId, 
-                    "Hello " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) 
-                    + ", \r\n this email is sent following the order you've done on the jo2024Tickets.fly.dev website.");
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
 
+        /*
+        *  Function to send email with tickets and order
+        */
+        public SendGrid.Response SendOrderEmail(ApplicationUser user, Order order, List<string> ticketPDF)
+        {
+            if (string.IsNullOrEmpty(Options.SendGridKey))
+            {
+                throw new Exception("Null SendGridKey");
+            }
+            //var apiKey = Environment.GetEnvironmentVariable("SendGridKey");
+            var client = new SendGridClient(Options.SendGridKey);
+            var from = new EmailAddress("gevie46000@gmail.com", "Jo2024Tickets.fly.dev");
+            var subject = "Order id: " + order.OrderId;
+            var to = new EmailAddress(user.Email, user.Name);
+
+            var plainTextContent = "Hello " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) + ", " +
+                "This email is sent following the order you've done on the jo2024Tickets.fly.dev website on " + order.OrderDate.ToString("MMMM dd, yyyy") + "." +
+                "" +
+                "Order id: " + order.OrderId +
+                "" +
+                "Attendee name: " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) +
+                "" +
+                "Please find all tickets attached to this email." +
+                "" +
+                "Important reminder: " +
+                "Please present yourself to the event 2 hours before starting time with your(s) ticket(s)" +
+                "QR code must be visible, and you must present an official ID card to justify your identity (corresponding to the one mentioned above).";
+
+            var htmlContent = "Hello " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) + ", " +
+                "<br /> This email is sent following the order you've done on the jo2024Tickets.fly.dev website on " + order.OrderDate.ToString("MMMM dd, yyyy") + "." +
+                "<br /> " +
+                "<br /> Order id: " + order.OrderId +
+                "<br /> " +
+                "<br /> Attendee name: " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) +
+                "<br /> " +
+                "<br /> Please find all tickets attached to this email." +
+                "<br /> " +
+                "<br /> <strong>Important reminder: </strong>" +
+                "<br /> Please present yourself to the event 2 hours before starting time with your(s) ticket(s)" +
+                "<br /> QR code must be visible, and you must present an official ID card to justify your identity (corresponding to the one mentioned above).";
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+
+            // add attachements: tickets
+            if (ticketPDF.Count != 0)
+            {
+                foreach (var ticketPath in ticketPDF)
+                {
+                    var bytes = System.IO.File.ReadAllBytes(ticketPath);
+                    var file = Convert.ToBase64String(bytes);
+                    msg.AddAttachment("ticket.pdf", file);
+                }
+            }
+
+            var response = client.SendEmailAsync(msg).Result;
+            return response;
+        }
 
         // create a ShoppingCartTicket based on a JoTicketSimplified
         [HttpPost]
@@ -322,11 +371,15 @@ namespace SiteWebJO2.Controllers
         }
 
         // create a PDF for each ticket, containing ticket informations and QR code
-        private List<Document> GenerateTicketPDF(List<JoTicket> joTicketList, ApplicationUser user, List<byte[]> qrCodeList)
+        private List<string> GenerateTicketPDF(List<JoTicket> joTicketList, ApplicationUser user, List<byte[]> qrCodeList)
         {
-            List<Document> ticketPDF = new List<Document>();
+            // get wwwroot path
+            string rootPath = this._env.WebRootPath;
+
+            List<string> ticketPDF = new List<string>();
             for (int i = 0; i < joTicketList.Count; i++)
             {
+
                 JoTicket ticket = joTicketList[i];
                 // get Ticket data
                 JoSession joSession = (from s in _applicationDbContext.JoSessions
@@ -365,8 +418,9 @@ namespace SiteWebJO2.Controllers
                         });
                         });
                     });
-                pdf.GeneratePdf("ticket" + i + ".pdf");
-                ticketPDF.Add(pdf);
+                var filePath = rootPath + "/ticket" + i + ".pdf";
+                pdf.GeneratePdf(filePath);
+                ticketPDF.Add(filePath);
             }
 
             return ticketPDF;

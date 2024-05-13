@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
-using QuestPDF.Fluent;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -44,26 +43,7 @@ namespace SiteWebJO2.Services
             await Execute(Options.SendGridKey, subject, message, toEmail);
         }
 
-        /// <summary>
-        /// add API key to send email with attachments
-        /// </summary>
-        /// <param name="toEmail"></param>
-        /// <param name="subject"></param>
-        /// <param name="message"></param>
-        /// <param name="attachments"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
-        public async Task SendEmailAsync(string toEmail, string subject, string message, List<Document>? attachments = default)
-        {
-            if (string.IsNullOrEmpty(Options.SendGridKey))
-            {
-                throw new Exception("Null SendGridKey");
-            }
-            await Execute(Options.SendGridKey, subject, message, toEmail, attachments);
-        }
-
-
-        public async Task Execute(string apiKey, string subject, string message, string toEmail, List<Document>? attachments = default)
+        public async Task Execute(string apiKey, string subject, string message, string toEmail)
         {
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
@@ -73,19 +53,6 @@ namespace SiteWebJO2.Services
                 PlainTextContent = message,
                 HtmlContent = message
             };
-
-            // add attachements if needed
-            if (attachments != null)
-            {
-                foreach (var attachment in attachments)
-                {
-                    // TODO
-                    //var bytes = File.ReadAllBytes("~/Templates/output.pdf");
-                    //var file = Convert.ToBase64String(bytes);
-                    //msg.AddAttachment("ABC.pdf", file);
-                }
-            }
-            
 
             msg.AddTo(new EmailAddress(toEmail));
 
