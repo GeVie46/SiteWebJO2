@@ -41,7 +41,7 @@ namespace SiteWebJO2.Controllers
     {
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _env;
 
         //constructor, with dependency injection of dbContext
         public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IEmailSender emailSender)
