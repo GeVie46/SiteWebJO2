@@ -1,13 +1,14 @@
 ﻿namespace SiteWebJO2.Models
 {
 
-    /*
-    * class JoTicket : save all tickets sold
-    * Property JoTicketKey : secured ticket key
-    * Property JoTicketStatus : to know if attendees can accessed to session (true) or not (false, already check tickets)
-    */
+    /// <summary>
+    /// class JoTicket : save all tickets sold
+    /// Property JoTicketKey : secured ticket key
+    /// Property JoTicketStatus : to know if attendees can accessed to session (true) or not (false, already check tickets)
+    /// </summary>
     public class JoTicket
     {
+
         public int JoTicketId { get; set; }
 
         // use string for UserId because Identity Framework set AspNetUsers.Id to string, in database : varchar(255)
@@ -26,9 +27,12 @@
 
     }
 
-    /*
-     * Class used for sending cookie data from client side to server side
-     */
+
+    /// <summary>
+    /// Class used for sending cookie data from client side to server side
+    /// </summary>
+    /// <param name="joTicketPackId">JoTicketPacks.JoTicketPackId</param>
+    /// <param name="joSessionId">JoSessions.JoSessionId</param>
     public class JoTicketSimplified (int joTicketPackId, int joSessionId)
     {
         public int JoTicketPackId { get; set; } = joTicketPackId;
@@ -36,9 +40,20 @@
 
     }
 
-    /*
-     * Class used for display shopping cart
-     */
+
+    /// <summary>
+    /// Ticket displayed in shopping cart
+    /// </summary>
+    /// <param name="joTicketPackId">JoTicketPacks.JoTicketPackId</param>
+    /// <param name="joSessionId">JoSessions.JoSessionId</param>
+    /// <param name="joSessionName">JoSessions.JoSessionName</param>
+    /// <param name="joSessionDate">JoSessions.JoSessionDate</param>
+    /// <param name="joSessionPlace">JoSessions.JoSessionPlace</param>
+    /// <param name="joSessionImage">JoSessions.JoSessionImage</param>
+    /// <param name="jopackPrice">price of ticket, calculated with function GetJoTicketPackPrice()</param>
+    /// <param name="joTicketPackName">JoTicketPacks.JoTicketPackName</param>
+    /// <param name="nbAttendees">JoTicketPacks.NbAttendees</param>
+    /// <param name="reductionRate">JoTicketPacks.ReductionRate</param>
     public class ShoppingCartTicket (int joTicketPackId, int joSessionId, string joSessionName, DateTime joSessionDate, string joSessionPlace, string joSessionImage, decimal jopackPrice, String joTicketPackName, int nbAttendees, decimal reductionRate)
     {
         public int JoTicketPackId { get; set; } = joTicketPackId;

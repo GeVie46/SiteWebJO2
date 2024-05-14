@@ -10,7 +10,13 @@ namespace SiteWebJO2.Controllers
     public class MockPaymentController : Controller
     {
 
-        // entry to Payment API
+        /// <summary>
+        /// entry to Payment API
+        /// </summary>
+        /// <param name="orderId">order to treat</param>
+        /// <param name="orderAmount">amount of order</param>
+        /// <param name="clientSiteKey">client key to recognize client id</param>
+        /// <returns>view MockPayment/PaymentProcess, to display order informations and ask for payment </returns>
         public IActionResult PaymentProcess(int orderId, decimal orderAmount, string clientSiteKey)
         {
 
@@ -29,7 +35,12 @@ namespace SiteWebJO2.Controllers
             return View(transaction);
         }
 
-        // user pay successful, call client web site to inform
+
+        /// <summary>
+        /// user pay successful, call client web site to inform
+        /// </summary>
+        /// <param name="transaction">transation treated</param>
+        /// <returns>redirect to client app, with status 'Success'</returns>
         [HttpPost]
         public IActionResult PaymentOk(Transaction transaction)
         {
@@ -37,7 +48,11 @@ namespace SiteWebJO2.Controllers
             return RedirectToAction("OrderTreatment", "ShoppingCarts",  new { orderId = transaction.OrderId, orderAmount = transaction.OrderAmount, transactionId = transaction.TransactionId, status = transaction.Status});
         }
 
-        // user pay abort, call client web site to inform
+        /// <summary>
+        /// user pay abort, call client web site to inform
+        /// </summary>
+        /// <param name="transaction">transation treated</param>
+        /// <returns>redirect to client app, with status 'Abort'</returns>
         [HttpPost]
         public IActionResult PaymentAbort(Transaction transaction)
         {
@@ -46,7 +61,10 @@ namespace SiteWebJO2.Controllers
         }
     }
 
-    // class to define object manipulated by MockPayment
+
+    /// <summary>
+    /// class to define object manipulated by MockPayment
+    /// </summary>
     public class Transaction
     {
         public string TransactionId { get; set; }

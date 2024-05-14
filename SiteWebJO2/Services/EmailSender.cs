@@ -6,12 +6,12 @@ using SendGrid.Helpers.Mail;
 namespace SiteWebJO2.Services
 {
 
-    /*
-     * Implement IEmailSender class
-     * code from 
-     * https://learn.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-8.0&tabs=visual-studio
-     * TODO : change email address to an email address with the domain name
-     */
+    /// <summary>
+    /// Implement IEmailSender class
+    /// code from 
+    /// https://learn.microsoft.com/en-us/aspnet/core/security/authentication/accconfirm?view=aspnetcore-8.0&tabs=visual-studio
+    /// TODO : change email address to an email address with the domain name
+    /// </summary>
     public class EmailSender : IEmailSender
     {
         private readonly ILogger _logger;
@@ -29,11 +29,11 @@ namespace SiteWebJO2.Services
         /// <summary>
         /// add API key to send email
         /// </summary>
-        /// <param name="toEmail"></param>
-        /// <param name="subject"></param>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <param name="toEmail">destination email</param>
+        /// <param name="subject">email subject</param>
+        /// <param name="message">email message</param>
+        /// <returns>Task to execute email sending</returns>
+        /// <exception cref="Exception">exception thrown if SendGrid key is unfound</exception>
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
             if (string.IsNullOrEmpty(Options.SendGridKey))
@@ -43,6 +43,14 @@ namespace SiteWebJO2.Services
             await Execute(Options.SendGridKey, subject, message, toEmail);
         }
 
+        /// <summary>
+        /// Send email. Only used for Identity purposes
+        /// </summary>
+        /// <param name="apiKey">SendGrid API key</param>
+        /// <param name="subject">email subject</param>
+        /// <param name="message">email message</param>
+        /// <param name="toEmail">destination email</param>
+        /// <returns>Task to send email</returns>
         public async Task Execute(string apiKey, string subject, string message, string toEmail)
         {
             var client = new SendGridClient(apiKey);
