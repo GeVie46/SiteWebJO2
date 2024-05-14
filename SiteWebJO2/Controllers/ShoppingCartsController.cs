@@ -650,6 +650,7 @@ namespace SiteWebJO2.Controllers
 
                         x.Item().PaddingVertical(5).LineHorizontal(1);
 
+                        // table to display tickets
                         x.Item().Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
@@ -731,7 +732,7 @@ namespace SiteWebJO2.Controllers
 
 
             // create PDF file
-            var filePath = rootPath + "invoice.pdf";
+            var filePath = rootPath + "/invoice.pdf";
             invoicePdf.GeneratePdf(filePath);
 
             return filePath;
