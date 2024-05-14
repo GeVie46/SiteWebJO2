@@ -31,6 +31,11 @@ using SiteWebJO2.Services;
 using Microsoft.Extensions.Options;
 using System.Numerics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.IO;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using static System.Net.WebRequestMethods;
+using EllipticCurve.Utils;
 
 
 namespace SiteWebJO2.Controllers
@@ -129,6 +134,7 @@ namespace SiteWebJO2.Controllers
 
         /// <summary>
         /// url to receive Payment API response and continue order treatment
+        /// save order in database, update available places in JoSession, generate tickets and invoice, send email, empty shopping cart
         /// </summary>
         /// <param name="orderId">order to treat</param>
         /// <param name="orderAmount">amount of the order</param>
@@ -176,10 +182,11 @@ namespace SiteWebJO2.Controllers
                 // generate ticket PDF
                 List<string> ticketPDF = GenerateTicketPDF(joTicketList, user, qrCodeList);
 
-                // generate invoice : TODO
+                // generate invoice
+                string invoicePath = GenerateInvoicePDF(ticketsArray, user, order);
 
-                // send tickets and invoice to user email : TODO
-                SendGrid.Response response = SendOrderEmail(user, order, ticketPDF);
+                // send tickets and invoice to user email
+                SendGrid.Response response = SendOrderEmail(user, order, ticketPDF, invoicePath);
                 if (response.StatusCode.Equals(System.Net.HttpStatusCode.Accepted)
                 || response.StatusCode.Equals(System.Net.HttpStatusCode.OK))
                 {
@@ -199,15 +206,16 @@ namespace SiteWebJO2.Controllers
 
 
         /// <summary>
-        /// Function to send email following the order passed, with each ticket attached
+        /// Function to send email following the order passed, with each ticket attached and invoice attached
         /// using NuGet package SendGrid 
         /// </summary>
         /// <param name="user">user to send email to</param>
         /// <param name="order">order passed</param>
         /// <param name="ticketPDF">list of PDF tickets filepaths</param>
+        /// <param name="invoicePath">filepath of invoice to attach</param>
         /// <returns>result of task 'sendEmail'</returns>
         /// <exception cref="Exception">exception thrown if SendGrid key is unfound</exception>
-        public SendGrid.Response SendOrderEmail(ApplicationUser user, Order order, List<string> ticketPDF)
+        public SendGrid.Response SendOrderEmail(ApplicationUser user, Order order, List<string> ticketPDF, string invoicePath)
         {
             if (string.IsNullOrEmpty(Options.SendGridKey))
             {
@@ -225,7 +233,7 @@ namespace SiteWebJO2.Controllers
                 "" +
                 "Attendee name: " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) +
                 "" +
-                "Please find all tickets attached to this email." +
+                "Please find all tickets and invoice attached to this email." +
                 "" +
                 "Important reminder: " +
                 "Please present yourself to the event 2 hours before starting time with your(s) ticket(s)" +
@@ -238,7 +246,7 @@ namespace SiteWebJO2.Controllers
                 "<br /> " +
                 "<br /> Attendee name: " + Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname) +
                 "<br /> " +
-                "<br /> Please find all tickets attached to this email." +
+                "<br /> Please find all tickets and invoice attached to this email." +
                 "<br /> " +
                 "<br /> <strong>Important reminder: </strong>" +
                 "<br /> Please present yourself to the event 2 hours before starting time with your(s) ticket(s)" +
@@ -255,6 +263,11 @@ namespace SiteWebJO2.Controllers
                     msg.AddAttachment("ticket.pdf", file);
                 }
             }
+
+            // add attachment: invoice
+            var invoiceBytes = System.IO.File.ReadAllBytes(invoicePath);
+            var invoiceFile = Convert.ToBase64String(invoiceBytes);
+            msg.AddAttachment("invoice.pdf", invoiceFile);
 
             // send email
             var response = client.SendEmailAsync(msg).Result;
@@ -451,17 +464,24 @@ namespace SiteWebJO2.Controllers
 
                             page.Header()
                                 .AlignCenter()
+                                .AlignMiddle()
+                                .Height(80)
                                 .Column(column =>
                                 {
                                     column.Item().Text(text =>
                                     {
-                                        text.Span("Olympic Games 2024").SemiBold().FontSize(24).FontColor(Colors.Grey.Darken4);
+                                        text.Span("Olympic Games 2024").SemiBold().FontSize(24);
                                         text.Span(" PA").SemiBold().FontSize(24).FontColor("#00A0FE");
-                                        text.Span("R").SemiBold().FontSize(24).FontColor(Colors.Grey.Darken4);
+                                        text.Span("R").SemiBold().FontSize(24);
                                         text.Span("IS ").SemiBold().FontSize(24).FontColor("#F61732");
                                     });
-                                    column.Item().PaddingVertical(5).LineHorizontal(1).LineColor(Colors.Grey.Darken4);
-                                    column.Item().Text("");
+                                    column.Item().PaddingVertical(5).LineHorizontal(1);
+                                    column.Item().Text(text => { text.Line(""); });      // carriage return
+                                    column.Item().AlignCenter().Text(text =>
+                                    {
+                                        text.Span("Ticket to event").FontSize(18);
+                                    });
+                                    column.Item().Text(text => { text.Line(""); });      // carriage return
                                 });
 
                             page.Content()
@@ -469,32 +489,32 @@ namespace SiteWebJO2.Controllers
                         {
                             x.Item().Text(text =>
                             {
-                                text.Span("Session: ").FontSize(24);
-                                text.Span(joSession.JoSessionName).FontSize(24);
+                                //text.Span("Session: ").FontSize(24);
+                                text.Span(joSession.JoSessionName).FontSize(24).LineHeight(1.5f);
 
                             });
                             x.Item().Text(text =>
                             {
                                 text.Span("Place: ");
-                                text.Span(joSession.JoSessionPlace);
+                                text.Span(joSession.JoSessionPlace).LineHeight(1.5f);
 
                             });
                             x.Item().Text(text =>
                             {
                                 text.Span("Date: ");
-                                text.Span(joSession.JoSessionDate.ToString("f", CultureInfo.CreateSpecificCulture("en-US")));
+                                text.Span(joSession.JoSessionDate.ToString("f", CultureInfo.CreateSpecificCulture("en-US"))).LineHeight(1.5f);
 
                             });
                             x.Item().Text(text =>
                             {
                                 text.Span("Pack: ");
-                                text.Span(joTicketPack.JoTicketPackName + " (" + joTicketPack.NbAttendees + " attendees)");
+                                text.Span(joTicketPack.JoTicketPackName + " (" + joTicketPack.NbAttendees + " attendees)").LineHeight(1.5f);
 
                             });
                             x.Item().Text(text =>
                             {
                                 text.Span("Main attendee name: ");
-                                text.Span(Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname));
+                                text.Span(Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname)).LineHeight(1.5f);
 
                             });
                             x.Item().Image(qrCodeList[i]);
@@ -553,6 +573,168 @@ namespace SiteWebJO2.Controllers
             var cookies = values.ToString().Split(';').ToList();
             var result = cookies.Select(c => new { Key = c.Split('=')[0].Trim(), Value = c.Split('=')[1].Trim() }).ToList();
             return result.FirstOrDefault(r => r.Key == cookieName).Value;
+        }
+
+        /// <summary>
+        /// Generate invoice in pdf format.  Use QuestPDF library
+        /// </summary>
+        /// <param name="ticketsArray">array of tickets in order</param>
+        /// <param name="user">user who passes the order</param>
+        /// <param name="order">order to edit</param>
+        /// <returns>invoice filepath</returns>
+        private string GenerateInvoicePDF(JoTicketSimplified[] ticketsArray, ApplicationUser user, Order order)
+        {
+            // get wwwroot path
+            string rootPath = this._env.WebRootPath;
+
+            decimal totalPrice = 0;
+
+            // create page layout
+            var invoicePdf = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                page.Margin(50);
+                page.Size(PageSizes.A4);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(12));
+                page.DefaultTextStyle(x => x.FontColor(Colors.Grey.Darken4));
+
+                page.Header()
+                    .AlignCenter()
+                    .AlignMiddle()
+                    .Height(80)
+                    .Column(column =>
+                    {
+                        column.Item().Text(text =>
+                        {
+                            text.Span("Olympic Games 2024").SemiBold().FontSize(24);
+                            text.Span(" PA").SemiBold().FontSize(24).FontColor("#00A0FE");
+                            text.Span("R").SemiBold().FontSize(24);
+                            text.Span("IS ").SemiBold().FontSize(24).FontColor("#F61732");
+                        });
+                        column.Item().PaddingVertical(5).LineHorizontal(1);
+                        column.Item().Text(text => { text.Line(""); });      // carriage return
+                        column.Item().AlignCenter().Text(text =>
+                        {
+                            text.Span("Invoice #").FontSize(18);
+                            text.Span(order.OrderId.ToString()).FontSize(18);
+                        });
+                        column.Item().Text(text =>{ text.Line(""); });      // carriage return
+                    });
+
+                page.Content()
+                    .Column(x =>
+                    {
+                        x.Item().Text(text =>
+                        {
+                            text.Span("Invoice date: ").Bold();
+                            text.Span(order.OrderDate.ToString("f", CultureInfo.CreateSpecificCulture("en-US")));
+                        });
+                        x.Item().Text(text => { text.Line(""); });      // carriage return
+
+                        x.Item().Text(text =>
+                        {
+                            text.Line("Bill from: ").Bold();
+                            text.Line("Jo2024Tickets.fly.dev");
+                            text.Line("0, empty Street");
+                            text.Line("00000 NOWHERE");
+                        });
+
+                        x.Item().Text(text =>
+                        {
+                            text.Line("Bill to: ").Bold();
+                            text.Line(Utilities.Utilities.CapitalizeFirstLetter(user.Name) + " " + Utilities.Utilities.CapitalizeFirstLetter(user.Lastname));
+                            text.Line(user.UserName);
+                        });
+
+                        x.Item().PaddingVertical(5).LineHorizontal(1);
+
+                        x.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(4);
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Text("Session name").SemiBold();
+                                header.Cell().Text("Pack name").SemiBold();
+                                header.Cell().AlignRight().Text("Unit price").SemiBold();
+                                header.Cell().AlignRight().Text("Quantity").SemiBold();
+                                header.Cell().AlignRight().Text("Total").SemiBold();
+
+                                header.Cell().ColumnSpan(5).PaddingTop(5).BorderBottom(1).BorderColor(Colors.Black);
+                            });
+
+                            List<JoTicketSimplified> ticketsList = ticketsArray.OrderBy(t=>t.JoSessionId).ThenBy(p=>p.JoTicketPackId).ToList();
+                            JoTicketSimplified lastTicket = new(-1, -1);
+                     
+                            foreach (var ticket in ticketsList)
+                            {
+                                if (JsonSerializer.Serialize(ticket) != JsonSerializer.Serialize(lastTicket))
+                                {
+                                    // get Ticket data
+                                    JoSession joSession = (from s in _applicationDbContext.JoSessions
+                                                       where s.JoSessionId == ticket.JoSessionId
+                                                       select s).FirstOrDefault();
+                                    JoTicketPack joTicketPack = (from p in _applicationDbContext.JoTicketPacks
+                                                             where p.JoTicketPackId == ticket.JoTicketPackId
+                                                             select p).FirstOrDefault();
+
+                                    // ticket description
+                                    table.Cell().Element(CellStyle).Text(text =>
+                                    {
+                                        text.Line(joSession.JoSessionName).SemiBold();
+                                        text.Line(joSession.JoSessionPlace);
+                                        text.Line(joSession.JoSessionDate.ToString("f", CultureInfo.CreateSpecificCulture("en-US")));
+                                    });
+
+                                    // pack description
+                                    table.Cell().Element(CellStyle).Text(joTicketPack.JoTicketPackName + " (" + joTicketPack.NbAttendees + " attendees)");
+
+                                    // unit price
+                                    decimal unitPrice = JoSessionsController.GetJoTicketPackPrice(joSession.JoSessionPrice, joTicketPack.NbAttendees, joTicketPack.ReductionRate);
+                                    table.Cell().Element(CellStyle).AlignRight().Text(unitPrice + "€");
+
+                                    // number of same ticket
+                                    int nbTickets = Utilities.Utilities.CountSameTicket(ticket, ticketsArray);
+                                    table.Cell().Element(CellStyle).AlignRight().Text(nbTickets);
+
+                                    // total price
+                                    totalPrice += nbTickets * unitPrice;
+                                    table.Cell().Element(CellStyle).AlignRight().Text(nbTickets*unitPrice + "€");
+
+                                    static IContainer CellStyle(IContainer container) => container.BorderBottom(1).BorderColor(Colors.Grey.Lighten2).PaddingVertical(5);
+
+                                    lastTicket = ticket;
+                                }
+
+                            }
+                        });     // end table
+
+                        x.Item().Text(text => { text.Line(" "); });      // carriage return
+
+                        x.Item().AlignRight().Text(text =>
+                        {
+                            text.Span("Subtotal (VAT incl.): ").SemiBold();
+                            text.Span(totalPrice + "€");
+                        });
+                    });   
+                });
+            });
+
+
+            // create PDF file
+            var filePath = rootPath + "invoice.pdf";
+            invoicePdf.GeneratePdf(filePath);
+
+            return filePath;
         }
 
     }
