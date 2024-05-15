@@ -1,0 +1,52 @@
+﻿@model IEnumerable<SiteWebJO2.Models.JoTicketPack>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.JoTicketPackName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NbAttendees)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReductionRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.JoTicketPackStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.JoTicketPackName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NbAttendees)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReductionRate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.JoTicketPackStatus)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.JoTicketPackId">Edit</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

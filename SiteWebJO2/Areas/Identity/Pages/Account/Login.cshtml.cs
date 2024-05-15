@@ -120,7 +120,7 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
                     if (User.IsInRole("admin"))
                     {
                         _logger.LogInformation("Admin logged in.");
-                        return Redirect("~/Admin/Dashboard");
+                        return Redirect("~/JoTicketPacks/Index");
                     }
                     else
                     {
