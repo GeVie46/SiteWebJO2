@@ -115,8 +115,19 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    
+                    // redirect to correct Admin Home page if admin role
+                    if (User.IsInRole("admin"))
+                    {
+                        _logger.LogInformation("Admin logged in.");
+                        return Redirect("~/Admin/Dashboard");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("User logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+                    
                 }
                 if (result.RequiresTwoFactor)
                 {
