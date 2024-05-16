@@ -26,6 +26,9 @@
             <th class="text-center">
                 @Html.DisplayNameFor(model => model.JoTicketPackStatus)
             </th>
+            <th class="text-center">
+                Packs sold
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -33,7 +36,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.JoTicketPackName)
+                <b>@Html.DisplayFor(modelItem => item.JoTicketPackName)</b>
             </td>
             <td class="text-center">
                 @Html.DisplayFor(modelItem => item.NbAttendees)
@@ -50,7 +53,10 @@
             <td class="text-center">
                 @Html.DisplayFor(modelItem => item.JoTicketPackStatus)
             </td>
-                <td class="text-end">
+            <td class="text-center">
+                0
+            </td>
+            <td class="text-end">
                     <a  asp-action="Edit" asp-route-id="@item.JoTicketPackId">Change</a>
             </td>
         </tr>
