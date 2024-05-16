@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SiteWebJO2.Controllers
 {
@@ -17,20 +19,48 @@ namespace SiteWebJO2.Controllers
     [Authorize(Roles = "admin")]
     public class JoTicketPacksController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _applicationDbContext;
 
-        public JoTicketPacksController(ApplicationDbContext context)
+        public JoTicketPacksController(ApplicationDbContext applicationDbContext)
         {
-            _context = context;
+            _applicationDbContext = applicationDbContext;
         }
 
         /// <summary>
         /// display JoTicketPacks, for admin account only
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.JoTicketPacks.ToListAsync());
+            // get JoTicketPack data
+            List<JoTicketPack> packList = (from p in _applicationDbContext.JoTicketPacks
+                      select p).ToList();
+            // get nb of pack sold
+            var ticketList = (from t in _applicationDbContext.JoTickets
+                              select t).ToList().GroupBy(JoTicket => JoTicket.JoTicketPackId)
+                                   .Select(group => new
+                                   {
+                                       JoTicketPackId = group.Key,
+                                       Count = group.Count()
+                                   });
+            var result = (from pack in packList
+                         join ticket in ticketList on pack.JoTicketPackId equals ticket.JoTicketPackId
+                         select new DisplayedJoTicketPack { JoTicketPackId = pack.JoTicketPackId, JoTicketPackName = pack.JoTicketPackName,
+                             NbAttendees = pack.NbAttendees, ReductionRate = pack.ReductionRate, JoTicketPackStatus = pack.JoTicketPackStatus,
+                             NbPacksSold = ticket.Count }).ToList();
+
+
+
+            //var ticketList = (from t in _applicationDbContext.JoTickets
+            //                       select t).ToList().GroupBy(JoTicket =>JoTicket.JoTicketPackId)
+            //                       .Select(group => new
+            //                       {
+            //                           JoTicketPackId = group.Key,
+            //                           Count = group.Count()
+            //                       });
+
+
+            return View(result.OrderByDescending(p => p.JoTicketPackStatus).ThenByDescending(p=>p.NbPacksSold));
         }
 
 
@@ -52,8 +82,8 @@ namespace SiteWebJO2.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(joTicketPack);
-                await _context.SaveChangesAsync();
+                _applicationDbContext.Add(joTicketPack);
+                await _applicationDbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(joTicketPack);
@@ -67,7 +97,7 @@ namespace SiteWebJO2.Controllers
                 return NotFound();
             }
 
-            var joTicketPack = await _context.JoTicketPacks.FindAsync(id);
+            var joTicketPack = await _applicationDbContext.JoTicketPacks.FindAsync(id);
             if (joTicketPack == null)
             {
                 return NotFound();
@@ -91,8 +121,8 @@ namespace SiteWebJO2.Controllers
             {
                 try
                 {
-                    _context.Update(joTicketPack);
-                    await _context.SaveChangesAsync();
+                    _applicationDbContext.Update(joTicketPack);
+                    await _applicationDbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -113,7 +143,7 @@ namespace SiteWebJO2.Controllers
        
         private bool JoTicketPackExists(int id)
         {
-            return _context.JoTicketPacks.Any(e => e.JoTicketPackId == id);
+            return _applicationDbContext.JoTicketPacks.Any(e => e.JoTicketPackId == id);
         }
     }
 }

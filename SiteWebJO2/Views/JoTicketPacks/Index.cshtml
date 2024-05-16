@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SiteWebJO2.Models.JoTicketPack>
+﻿@model IEnumerable<SiteWebJO2.Models.DisplayedJoTicketPack>
 
 @{
     ViewData["Title"] = "Dashboard";
@@ -27,7 +27,7 @@
                 @Html.DisplayNameFor(model => model.JoTicketPackStatus)
             </th>
             <th class="text-center">
-                Packs sold
+                @Html.DisplayNameFor(model => model.NbPacksSold)
             </th>
             <th></th>
         </tr>
@@ -54,7 +54,7 @@
                 @Html.DisplayFor(modelItem => item.JoTicketPackStatus)
             </td>
             <td class="text-center">
-                0
+                    @Html.DisplayFor(modelItem => item.NbPacksSold)
             </td>
             <td class="text-end">
                     <a  asp-action="Edit" asp-route-id="@item.JoTicketPackId">Change</a>
