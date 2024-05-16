@@ -1,28 +1,29 @@
 ﻿@model IEnumerable<SiteWebJO2.Models.JoTicketPack>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="d-inline-flex mb-3 container justify-content-center">
+    <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
+
 <table class="table">
-    <thead>
+    <thead class="text-center text-light bgBlue">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.JoTicketPackName)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.NbAttendees)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.ReductionRate)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.JoTicketPackStatus)
             </th>
             <th></th>
@@ -34,19 +35,33 @@
             <td>
                 @Html.DisplayFor(modelItem => item.JoTicketPackName)
             </td>
-            <td>
+            <td class="text-center">
                 @Html.DisplayFor(modelItem => item.NbAttendees)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReductionRate)
-            </td>
-            <td>
+            @if (item.ReductionRate > 0)
+            {
+                var rate = Math.Ceiling(item.ReductionRate * 100);
+                <td class="text-center">@rate%</td>
+            }
+            else
+            {
+                <td class="text-center font-italic">No reduction</td>
+            }
+            <td class="text-center">
                 @Html.DisplayFor(modelItem => item.JoTicketPackStatus)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.JoTicketPackId">Edit</a>
+                <td class="text-end">
+                    <a  asp-action="Edit" asp-route-id="@item.JoTicketPackId">Change</a>
             </td>
         </tr>
 }
     </tbody>
 </table>
+
+<p class="text-end">
+    <a  asp-action="Create">Add a pack</a>
+</p>
+
+<p class="text-end">
+    <a class="btn btn-lg mb-3 mt-3 letsgoBtn" asp-area="" asp-controller="Admin" asp-action="CheckAccess">Check access to event</a>
+</p>

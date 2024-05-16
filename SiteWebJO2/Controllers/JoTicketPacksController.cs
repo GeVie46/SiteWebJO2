@@ -11,6 +11,9 @@ using SiteWebJO2.Models;
 
 namespace SiteWebJO2.Controllers
 {
+    /// <summary>
+    /// class and associated views created with auto generation
+    /// </summary>
     [Authorize(Roles = "admin")]
     public class JoTicketPacksController : Controller
     {
@@ -21,14 +24,20 @@ namespace SiteWebJO2.Controllers
             _context = context;
         }
 
-        // GET: JoTicketPacks
+        /// <summary>
+        /// display JoTicketPacks, for admin account only
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> Index()
         {
             return View(await _context.JoTicketPacks.ToListAsync());
         }
 
 
-        // GET: JoTicketPacks/Create
+        /// <summary>
+        /// view to create a new JoTicketPack, for admin account only
+        /// </summary>
+        /// <returns></returns>
         public IActionResult Create()
         {
             return View();
