@@ -68,4 +68,17 @@
         public decimal ReductionRate { get; set; } = reductionRate;
 
     }
+
+    /// <summary>
+    /// class to describe the code included in Qr code
+    /// </summary>
+    /// <param name="ticketKeys">hash of ticket keys</param>
+    /// <param name="firstname">firstname of attendee</param>
+    /// <param name="lastname">lastnamt of attendee</param>
+    public class ScanTicket(string ticketKeys, string firstname, string lastname)
+    {
+        public string TicketKeys { get; set; } = ticketKeys;
+        public string Firstname { get; set; } = firstname;
+        public string Lastname { get; set; } = lastname;
+    }
 }

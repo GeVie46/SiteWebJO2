@@ -1,7 +1,44 @@
-﻿@{
+﻿@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+
+@{
     ViewData["Title"] = "Check access";
+    var requestToken = Antiforgery.GetAndStoreTokens(Context).RequestToken;
 }
+
+<input id="RequestVerificationToken" type="hidden" value="@requestToken" />
 
 <div class="d-inline-flex mb-3 container justify-content-center">
     <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
+</div>
+
+<script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+
+<div class="container">
+    <div class="row">
+        <div>
+            <video id="preview"></video>
+            <p id="displayString"></p>
+            <script type="text/javascript">
+                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+                scanner.addListener('scan', function (content) {
+                    //alert(content);
+                    PostToController("/Admin/CheckQrCode", content)
+                        .then((ticket) => {
+                            //display ticket data
+                            document.getElementById("displayString").textContent = ticket.ticketString;
+                        })
+                });
+                Instascan.Camera.getCameras().then(function (cameras) {
+                    if (cameras.length > 0) {
+                        scanner.start(cameras[0]);
+                    }
+                    else {
+                        console.error('No cameras found.');
+                    }
+                }).catch(function (e) {
+                    console.error(e);
+                });
+            </script>
+        </div>
+    </div>
 </div>
