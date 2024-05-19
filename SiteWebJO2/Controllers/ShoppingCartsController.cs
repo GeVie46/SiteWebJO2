@@ -533,9 +533,9 @@ namespace SiteWebJO2.Controllers
         }
 
         /// <summary>
-        /// update JoSessionNbTotalBooked : substract nb of places on ticket
+        /// update JoSessionNbTotalBooked : add nb of places on ticket
         /// </summary>
-        /// <param name="ticket">ticket to substract to JoSession. To get JoSessionId and NbAttendees</param>
+        /// <param name="ticket">ticket to add to JoSession. To get JoSessionId and NbAttendees</param>
         /// <returns>return true if operation is well done</returns>
         private bool UpdateSessionNbBooked(JoTicketSimplified ticket)
         { 
@@ -548,10 +548,10 @@ namespace SiteWebJO2.Controllers
 
                 // update nbTotalBooked in JoSessions
                 var joSessionToUpdate= _applicationDbContext.JoSessions.FirstOrDefault(s => s.JoSessionId == ticket.JoSessionId);
-                int newNbBooked = joSessionToUpdate.JoSessionNbTotalBooked - nb;
-                if (newNbBooked < 0)
+                int newNbBooked = joSessionToUpdate.JoSessionNbTotalBooked + nb;
+                if (newNbBooked > joSessionToUpdate.JoSessionNbTotalAttendees)
                 {
-                    throw new Exception("joSessionToUpdate.JoSessionNbTotalBooked can not be <0");
+                    throw new Exception("joSessionToUpdate.JoSessionNbTotalBooked can not be more than joSessionToUpdate.JoSessionNbTotalAttendees");
                 }
                 joSessionToUpdate.JoSessionNbTotalBooked = newNbBooked;
                 _applicationDbContext.SaveChanges();
