@@ -14,31 +14,67 @@
 <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 
 <div class="container">
-    <div class="row">
+    <div class="row" id="cameraRow">
         <div>
+            <h3>Scan QR code on ticket please...</h3>
             <video id="preview"></video>
-            <p id="displayString"></p>
-            <script type="text/javascript">
-                let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-                scanner.addListener('scan', function (content) {
-                    //alert(content);
-                    PostToController("/Admin/CheckQrCode", content)
-                        .then((ticket) => {
-                            //display ticket data
-                            document.getElementById("displayString").textContent = ticket.ticketString;
-                        })
-                });
-                Instascan.Camera.getCameras().then(function (cameras) {
-                    if (cameras.length > 0) {
-                        scanner.start(cameras[0]);
-                    }
-                    else {
-                        console.error('No cameras found.');
-                    }
-                }).catch(function (e) {
-                    console.error(e);
-                });
-            </script>
         </div>
     </div>
+    <div class="row" hidden id="resultRow">
+        <h3 class="text-center text-light bgBlue">Sport session</h3>
+        <div class="card cardOffers mb-2">
+            <p id="sessionName"></p>
+            <p id="sessionPlace"></p>
+            <p id="sessionDate"></p>
+        </div>
+        <h3>Name on ticket</h3>
+        <div class="card cardOffers mb-2">
+            <p id="userName"></p>
+        </div>
+        <h3>Pack name</h3>
+        <div class="card cardOffers mb-2">
+            <p id="packName"></p>
+        </div>
+        <h3><i class="bi bi-shield-fill-check"></i></h3>
+        <h3>Authenticated</h3>
+
+    </div>
 </div>
+
+<script type="text/javascript">
+    let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    scanner.addListener('scan', function (content) {
+        PostToController("/Admin/CheckQrCode", content)
+            .then((ticket) => displayTicketData(ticket))
+    });
+    Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+            scanner.start(cameras[0]);
+        }
+        else {
+            console.error('No cameras found.');
+        }
+    }).catch(function (e) {
+        console.error(e);
+    });
+
+
+    //
+    function displayTicketData(ticket) {
+        console.log(ticket);
+        if (ticket != null) {
+            document.getElementById("cameraRow").hidden = true;
+            document.getElementById("resultRow").hidden = false;
+
+            document.getElementById("sessionName").textContent = ticket.sessionName;
+            document.getElementById("sessionPlace").textContent = ticket.sessionPlace;
+            document.getElementById("sessionDate").textContent = ticket.sessionDate;
+            document.getElementById("userName").textContent = ticket.firstname + " " + ticket.lastname;
+            document.getElementById("packName").textContent = ticket.packName + "(" + ticket.packNb + " attendee(s)";
+        }
+        else { 
+            // display msg
+
+        }
+    }
+</script>

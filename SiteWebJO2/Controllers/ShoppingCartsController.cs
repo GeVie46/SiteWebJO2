@@ -411,8 +411,8 @@ namespace SiteWebJO2.Controllers
                 // hash concatenation, using SHA-256 hash algorithm, and convert to string
                 string hashValueStr = Convert.ToBase64String(SHA256.HashData(concatKeys));
 
-                // create ScanTicket object with key, user firstname and lastname
-                ScanTicket scanTicket = new ScanTicket(hashValueStr, user.Name, user.Lastname);
+                // create ScanTicket object with key and mail of user
+                ScanTicket scanTicket = new ScanTicket(hashValueStr, user.UserName);
 
                 // create QR code
                 QRCodeData qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(scanTicket), QRCodeGenerator.ECCLevel.Q);
