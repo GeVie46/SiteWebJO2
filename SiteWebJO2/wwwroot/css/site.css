@@ -266,5 +266,16 @@ box-shadow: 0px 2px 4px 0px rgba(0,0,0,0.5);
     margin-bottom: 1rem;
 }
 
+/*Specific css for View "Admin/CheckAccess"*/
 
+.check-title {
+    border-radius: 10px;
+    background-color: var(--blue);
+    color: white;
+    padding: 7px;
+}
+
+.check-auth {
+    color: var(--green);
+}
 

@@ -21,23 +21,31 @@
         </div>
     </div>
     <div class="row" hidden id="resultRow">
-        <h3 class="text-center text-light bgBlue">Sport session</h3>
-        <div class="card cardOffers mb-2">
-            <p id="sessionName"></p>
-            <p id="sessionPlace"></p>
-            <p id="sessionDate"></p>
+        <div class="col">
+            <h5 class="text-center check-title">Sport session</h5>
+            <div class="card cardOffers mb-4 m-0" style="padding: 7px;">
+                <p class="m-0">
+                    <b id="sessionName" style="padding: 7px;"></b><br />
+                    <span id="sessionPlace" style="padding: 7px;"></span><br />
+                    <span id="sessionDate" style="padding: 7px;"></span>
+                </p>
+            </div>
+            <h5 class="text-center check-title">Name on ticket</h5>
+            <div class="card cardOffers mb-2 m-0">
+                <p id="userName" style="padding: 7px;" class="m-0"></p>
+            </div>
         </div>
-        <h3>Name on ticket</h3>
-        <div class="card cardOffers mb-2">
-            <p id="userName"></p>
+        <div class="col">
+            <h5 class="text-center check-title">Pack name</h5>
+            <div class="card cardOffers mb-4 m-0">
+                <p id="packName" style="padding: 7px;" class="m-0"></p>
+            </div>
+            <h1 class="text-center check-auth"><i class="bi bi-shield-fill-check"></i></h1>
+            <h3 class="text-center check-auth mb-4">Authenticated</h3>
+            <p class="text-center">
+                <a class="btn btn-lg mb-3 mt-3 letsgoBtn" asp-area="" asp-controller="Admin" asp-action="CheckAccess">Check another ticket</a>
+            </p>
         </div>
-        <h3>Pack name</h3>
-        <div class="card cardOffers mb-2">
-            <p id="packName"></p>
-        </div>
-        <h3><i class="bi bi-shield-fill-check"></i></h3>
-        <h3>Authenticated</h3>
-
     </div>
 </div>
 
@@ -68,9 +76,9 @@
 
             document.getElementById("sessionName").textContent = ticket.sessionName;
             document.getElementById("sessionPlace").textContent = ticket.sessionPlace;
-            document.getElementById("sessionDate").textContent = ticket.sessionDate;
+            document.getElementById("sessionDate").textContent = FormatDate(ticket.sessionDate);
             document.getElementById("userName").textContent = ticket.firstname + " " + ticket.lastname;
-            document.getElementById("packName").textContent = ticket.packName + "(" + ticket.packNb + " attendee(s)";
+            document.getElementById("packName").textContent = ticket.packName + ": " + ticket.packNb + " attendee(s)";
         }
         else { 
             // display msg

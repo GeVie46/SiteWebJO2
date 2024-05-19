@@ -104,8 +104,8 @@ namespace SiteWebJO2.Controllers
 
                         ticket = new
                         {
-                            firstname = user.Name,
-                            lastname = user.Lastname,
+                            firstname = Utilities.Utilities.CapitalizeFirstLetter(user.Name),
+                            lastname = Utilities.Utilities.CapitalizeFirstLetter(user.Lastname),
                             sessionName = js.JoSessionName,
                             sessionPlace = js.JoSessionPlace,
                             sessionDate = js.JoSessionDate,
