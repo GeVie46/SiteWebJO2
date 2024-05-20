@@ -42,45 +42,35 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
-        //public string CheckQrCode([FromBody] ScanTicket scanTicket)
-        //{
-        //    return CheckQrCode(scanTicket, null);
-        //}
-
         /// <summary>
         /// function to read string of qr code, check qr code authenticity and return ticket data
         /// the QR code string is read by javascript
         /// </summary>
         /// <param name="qrCodeString">the string read on qr code</param>
+        /// <param name="ticket">object used to return ticket data</param>
         /// <returns>ticket data</returns>
         [HttpPost]
         public string CheckQrCode([FromBody] ScanTicket scanTicket, object? ticket = null)
         {
             try
             {
+                if (scanTicket == null) { return JsonSerializer.Serialize(new { msg="invalid ticket"}); }
                 string username = scanTicket.Username;
-                ticket = new
-                {
-                    firstname = "",
-                    lastname = "",
-                    sessionName = "",
-                    sessionPlace = "",
-                    sessionDate = "",
-                    packName = "",
-                    packNb = ""
-                };
+                if (username.IsNullOrEmpty()) { JsonSerializer.Serialize(new { msg = "invalid ticket" }); }
+                ticket = new {};
 
                 // get user corresponding to username
                 ApplicationUser user = (from u in _applicationDbContext.Users
                                                where u.UserName == username
                                                select u).FirstOrDefault();
-
-                // exception : no user found
+                if (user == null) { return JsonSerializer.Serialize(new { msg = "User unknown" }); }
 
                 // get all tickets of user
                 List<JoTicket> tickets = (from t in _applicationDbContext.JoTickets
                                             where t.ApplicationUserId == user.Id
                                             select t).ToList();
+
+                if (tickets.Count==0) { return JsonSerializer.Serialize(new { msg = "No tickets found for this user" }); }
 
                 // compare qr code key to hash of ticketKey+userKey
                 tickets.ForEach(t =>
@@ -100,8 +90,8 @@ namespace SiteWebJO2.Controllers
                         var jtp = (from p in _applicationDbContext.JoTicketPacks
                                     where p.JoTicketPackId == t.JoTicketPackId
                                     select p).FirstOrDefault();
-                        //ticket.sessionName = js.JoSessionName;
 
+                        //create object to send data to html page
                         ticket = new
                         {
                             firstname = Utilities.Utilities.CapitalizeFirstLetter(user.Name),
@@ -114,19 +104,15 @@ namespace SiteWebJO2.Controllers
                         };
                     }
                 });
-
+                
                 return JsonSerializer.Serialize(ticket);
 
-                // return null if ticket not authenticated 
-                //return null;
             }
             catch
             {
-                // return null if error
-                return null;
+                return JsonSerializer.Serialize(new { msg = "Error while processing check" });
             }
         }
-
 
     }
 }

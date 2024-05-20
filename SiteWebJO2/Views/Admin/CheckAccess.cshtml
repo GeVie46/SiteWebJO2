@@ -14,12 +14,14 @@
 <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 
 <div class="container">
+    @* page to scan ticket *@
     <div class="row" id="cameraRow">
         <div>
             <h3>Scan QR code on ticket please...</h3>
             <video id="preview"></video>
         </div>
     </div>
+    @* page to display ticket data if scan OK *@
     <div class="row" hidden id="resultRow">
         <div class="col">
             <h5 class="text-center check-title">Sport session</h5>
@@ -47,6 +49,15 @@
             </p>
         </div>
     </div>
+    @* page to display error if scan not OK *@
+    <div class="row" hidden id="errorRow">
+        <h1 class="text-center check-authFailed"><i class="bi bi-shield-fill-check"></i></h1>
+        <h3 class="text-center check-authFailed mb-4">Authentication failed</h3>
+        <p class="text-center" id="errorMsg" style="padding: 7px;" class="m-0"></p>
+        <p class="text-center">
+            <a class="btn btn-lg mb-3 mt-3 letsgoBtn" asp-area="" asp-controller="Admin" asp-action="CheckAccess">Check another ticket</a>
+        </p>
+    </div>
 </div>
 
 <script type="text/javascript">
@@ -70,7 +81,7 @@
     //
     function displayTicketData(ticket) {
         console.log(ticket);
-        if (ticket != null) {
+        if (ticket.firstname != null) {
             document.getElementById("cameraRow").hidden = true;
             document.getElementById("resultRow").hidden = false;
 
@@ -81,7 +92,11 @@
             document.getElementById("packName").textContent = ticket.packName + ": " + ticket.packNb + " attendee(s)";
         }
         else { 
+            //display error page
+            document.getElementById("cameraRow").hidden = true;
+            document.getElementById("errorRow").hidden = false;
             // display msg
+            document.getElementById("errorMsg").innerHTML = "<b>" + ticket.msg + "</b>";
 
         }
     }
