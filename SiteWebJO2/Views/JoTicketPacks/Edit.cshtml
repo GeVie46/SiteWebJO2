@@ -19,26 +19,26 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="JoTicketPackId" />
             <div class="form-group">
-                <label asp-for="JoTicketPackName" class="control-label"></label>
+                <label asp-for="JoTicketPackName" class="control-label fw-bold"></label>
                 <input asp-for="JoTicketPackName" class="form-control" />
                 <span asp-validation-for="JoTicketPackName" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
-                <label asp-for="NbAttendees" class="control-label"></label>
+                <label asp-for="NbAttendees" class="control-label fw-bold"></label>
                 <input asp-for="NbAttendees" class="form-control" />
                 <span asp-validation-for="NbAttendees" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group">
-                <label asp-for="ReductionRate" class="control-label"></label>
+                <label asp-for="ReductionRate" class="control-label fw-bold"></label>
                 <input asp-for="ReductionRate" class="form-control" />
                 <span asp-validation-for="ReductionRate" class="text-danger"></span>
             </div>
             <br />
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" id="check-input-pack" asp-for=" JoTicketPackStatus" /> @Html.DisplayNameFor(model => model.JoTicketPackStatus)
+                    <input class="form-check-input fw-bold" id="check-input-pack" asp-for=" JoTicketPackStatus" /> @Html.DisplayNameFor(model => model.JoTicketPackStatus)
                 </label>
             </div>
             <br />

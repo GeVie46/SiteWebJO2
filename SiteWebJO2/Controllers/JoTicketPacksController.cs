@@ -67,20 +67,35 @@ namespace SiteWebJO2.Controllers
             return View();
         }
 
-        // POST: JoTicketPacks/Create
+        /// <summary>
+        /// create a new pack
+        /// </summary>
+        /// <param name="joTicketPack">data of pack</param>
+        /// <returns></returns>
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("JoTicketPackId,JoTicketPackName,NbAttendees,ReductionRate,JoTicketPackStatus")] JoTicketPack joTicketPack)
         {
+            var pack = new JoTicketPack { };
             if (ModelState.IsValid)
             {
+                // change value of reduction rate : /100
+                pack = new JoTicketPack
+                {
+                    JoTicketPackId = joTicketPack.JoTicketPackId,
+                    JoTicketPackName = joTicketPack.JoTicketPackName,
+                    NbAttendees = joTicketPack.NbAttendees,
+                    ReductionRate = joTicketPack.ReductionRate / 100,
+                    JoTicketPackStatus = joTicketPack.JoTicketPackStatus
+                };
+
                 _applicationDbContext.Add(joTicketPack);
                 await _applicationDbContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(joTicketPack);
+            return View(pack);
         }
 
         /// <summary>

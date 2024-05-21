@@ -1,48 +1,54 @@
 ﻿@model SiteWebJO2.Models.JoTicketPack
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create a new pack";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+<div class="d-inline-flex mb-3 container justify-content-center">
+    <h1 class="fontBlue mansalva-regular me-3">@ViewData["Title"]</h1>
+</div>
 
-<h4>JoTicketPack</h4>
-<hr />
+
 <div class="row">
+    <div class="col-md-4 d-flex align-items-end">
+        <a asp-action="Index">Back to List</a>
+    </div>
     <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="JoTicketPackName" class="control-label"></label>
+                <label asp-for="JoTicketPackName" class="control-label fw-bold"></label>
                 <input asp-for="JoTicketPackName" class="form-control" />
                 <span asp-validation-for="JoTicketPackName" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group">
-                <label asp-for="NbAttendees" class="control-label"></label>
+                <label asp-for="NbAttendees" class="control-label fw-bold"></label>
                 <input asp-for="NbAttendees" class="form-control" />
                 <span asp-validation-for="NbAttendees" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group">
-                <label asp-for="ReductionRate" class="control-label"></label>
+                <label asp-for="ReductionRate" class="control-label fw-bold"></label>
                 <input asp-for="ReductionRate" class="form-control" />
                 <span asp-validation-for="ReductionRate" class="text-danger"></span>
             </div>
+            <br />
             <div class="form-group form-check">
-                <label class="form-check-label">
+                <label class="form-check-label fw-bold">
                     <input class="form-check-input" asp-for="JoTicketPackStatus" /> @Html.DisplayNameFor(model => model.JoTicketPackStatus)
                 </label>
             </div>
+            <br />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn bgBlue" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

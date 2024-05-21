@@ -26,7 +26,7 @@ namespace SiteWebJO2.Models
 
         [DisplayName("Reduction rate (%)")]
         [Required]
-        [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:N0}", ApplyFormatInEditMode = true)]           /*display the number as an integer*/
         [Range(0, 100.00, ErrorMessage = "Reduction rate must be an integer between 0 and 100")]
         public decimal ReductionRate { get; set;}
 
