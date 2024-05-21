@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EllipticCurve.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -47,10 +48,11 @@ namespace SiteWebJO2.Controllers
 
             // gather last results together
             var result = (from pack in packList
-                         join ticket in ticketList on pack.JoTicketPackId equals ticket.JoTicketPackId
+                         join ticket in ticketList on pack.JoTicketPackId equals ticket.JoTicketPackId into groupPack
+                         from subgroup in groupPack.DefaultIfEmpty()
                          select new DisplayedJoTicketPack { JoTicketPackId = pack.JoTicketPackId, JoTicketPackName = pack.JoTicketPackName,
                              NbAttendees = pack.NbAttendees, ReductionRate = pack.ReductionRate, JoTicketPackStatus = pack.JoTicketPackStatus,
-                             NbPacksSold = ticket.Count }).ToList();
+                             NbPacksSold = subgroup?.Count ?? 0}).ToList();
 
             return View(result.OrderByDescending(p => p.JoTicketPackStatus).ThenByDescending(p=>p.NbPacksSold));
         }
@@ -94,7 +96,15 @@ namespace SiteWebJO2.Controllers
             {
                 return NotFound();
             }
-            return View(joTicketPack);
+            // change display of reduction rate : *100
+            var pack = new JoTicketPack {
+                JoTicketPackId = joTicketPack.JoTicketPackId,
+                JoTicketPackName = joTicketPack.JoTicketPackName,
+                NbAttendees = joTicketPack.NbAttendees,
+                ReductionRate = joTicketPack.ReductionRate * 100,
+                JoTicketPackStatus = joTicketPack.JoTicketPackStatus
+            };
+            return View(pack);
         }
 
         // POST: JoTicketPacks/Edit/5
@@ -113,7 +123,17 @@ namespace SiteWebJO2.Controllers
             {
                 try
                 {
-                    _applicationDbContext.Update(joTicketPack);
+                    // change value of reduction rate : /100
+                    var pack = new JoTicketPack
+                    {
+                        JoTicketPackId = joTicketPack.JoTicketPackId,
+                        JoTicketPackName = joTicketPack.JoTicketPackName,
+                        NbAttendees = joTicketPack.NbAttendees,
+                        ReductionRate = joTicketPack.ReductionRate / 100,
+                        JoTicketPackStatus = joTicketPack.JoTicketPackStatus
+                    };
+
+                    _applicationDbContext.Update(pack);
                     await _applicationDbContext.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

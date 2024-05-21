@@ -24,17 +24,17 @@ namespace SiteWebJO2.Models
         [Range(0, 50.00, ErrorMessage ="Maximum nb of attendees is 50")]
         public int NbAttendees { get; set; } = 1;
 
-        [DisplayName("Reduction rate")]
+        [DisplayName("Reduction rate (%)")]
         [Required]
         // Range validation attribut does not handle decimal number
-        [Range(0, 1.00, ErrorMessage = "Reduction rate must be a decimal between 0 and 1")]
+        [Range(0, 100.00, ErrorMessage = "Reduction rate must be an integer between 0 and 100")]
         public decimal ReductionRate { get; set;}
 
         [DisplayName("Currently used")]
         public bool JoTicketPackStatus { get; set; } = true;
 
         
-        public ICollection<JoTicket> JoTickets { get; set; }
+        public ICollection<JoTicket>? JoTickets { get; set; }
     }
 
 
