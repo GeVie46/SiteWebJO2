@@ -411,11 +411,11 @@ namespace SiteWebJO2.Controllers
                 // hash concatenation, using SHA-256 hash algorithm, and convert to string
                 string hashValueStr = Convert.ToBase64String(SHA256.HashData(concatKeys));
 
-                // add user firstname and lastname
-                qrCodeStr = hashValueStr + ";Firstname:" + user.Name + ";Lastname:" + user.Lastname;
+                // create ScanTicket object with key and mail of user
+                ScanTicket scanTicket = new ScanTicket(hashValueStr, user.UserName);
 
                 // create QR code
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(qrCodeStr, QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(JsonSerializer.Serialize(scanTicket), QRCodeGenerator.ECCLevel.Q);
                 PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
                 byte[] qrCodeImage = qrCode.GetGraphic(20);
                 qrCodeList.Add(qrCodeImage);

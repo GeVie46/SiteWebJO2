@@ -35,6 +35,7 @@ namespace SiteWebJO2.Controllers
             // get JoTicketPack data
             List<JoTicketPack> packList = (from p in _applicationDbContext.JoTicketPacks
                       select p).ToList();
+
             // get nb of pack sold
             var ticketList = (from t in _applicationDbContext.JoTickets
                               select t).ToList().GroupBy(JoTicket => JoTicket.JoTicketPackId)
@@ -43,22 +44,13 @@ namespace SiteWebJO2.Controllers
                                        JoTicketPackId = group.Key,
                                        Count = group.Count()
                                    });
+
+            // gather last results together
             var result = (from pack in packList
                          join ticket in ticketList on pack.JoTicketPackId equals ticket.JoTicketPackId
                          select new DisplayedJoTicketPack { JoTicketPackId = pack.JoTicketPackId, JoTicketPackName = pack.JoTicketPackName,
                              NbAttendees = pack.NbAttendees, ReductionRate = pack.ReductionRate, JoTicketPackStatus = pack.JoTicketPackStatus,
                              NbPacksSold = ticket.Count }).ToList();
-
-
-
-            //var ticketList = (from t in _applicationDbContext.JoTickets
-            //                       select t).ToList().GroupBy(JoTicket =>JoTicket.JoTicketPackId)
-            //                       .Select(group => new
-            //                       {
-            //                           JoTicketPackId = group.Key,
-            //                           Count = group.Count()
-            //                       });
-
 
             return View(result.OrderByDescending(p => p.JoTicketPackStatus).ThenByDescending(p=>p.NbPacksSold));
         }

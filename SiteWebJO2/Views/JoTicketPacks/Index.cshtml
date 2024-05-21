@@ -10,7 +10,7 @@
 </div>
 
 
-
+@* display list of JoTicketPacks *@
 <table class="table">
     <thead class="text-center text-light bgBlue">
         <tr>
@@ -54,10 +54,10 @@
                 @Html.DisplayFor(modelItem => item.JoTicketPackStatus)
             </td>
             <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.NbPacksSold)
+                @Html.DisplayFor(modelItem => item.NbPacksSold)
             </td>
             <td class="text-end">
-                    <a  asp-action="Edit" asp-route-id="@item.JoTicketPackId">Change</a>
+                <a  asp-action="Edit" asp-route-id="@item.JoTicketPackId">Change</a>
             </td>
         </tr>
 }
