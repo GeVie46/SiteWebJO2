@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Data.SqlClient;
@@ -101,6 +102,10 @@ namespace SiteWebJO2
             /* to access the currently logged in user
              */
             builder.Services.AddHttpContextAccessor();
+
+
+            // to persist session on online host for more than 2 min
+            builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(Directory.GetCurrentDirectory())).SetDefaultKeyLifetime(TimeSpan.FromDays(7));
 
             var app = builder.Build();
 
