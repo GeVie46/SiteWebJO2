@@ -28,11 +28,6 @@ namespace SiteWebJO2.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
-        public IActionResult Dashboard()
-        {
-            return View();
-        }
-
 
         /// <summary>
         /// return view to check access

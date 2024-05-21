@@ -44,6 +44,8 @@ namespace SiteWebJO2.Controllers
                                        JoTicketPackId = group.Key,
                                        Count = group.Count()
                                    });
+
+            // gather last results together
             var result = (from pack in packList
                          join ticket in ticketList on pack.JoTicketPackId equals ticket.JoTicketPackId
                          select new DisplayedJoTicketPack { JoTicketPackId = pack.JoTicketPackId, JoTicketPackName = pack.JoTicketPackName,
