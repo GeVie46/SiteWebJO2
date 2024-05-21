@@ -83,7 +83,11 @@ namespace SiteWebJO2.Controllers
             return View(joTicketPack);
         }
 
-        // GET: JoTicketPacks/Edit/5
+        /// <summary>
+        /// display data of pack selected
+        /// </summary>
+        /// <param name="id">id of the pack chosen</param>
+        /// <returns></returns>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -107,7 +111,12 @@ namespace SiteWebJO2.Controllers
             return View(pack);
         }
 
-        // POST: JoTicketPacks/Edit/5
+        /// <summary>
+        /// change data of a pack
+        /// </summary>
+        /// <param name="id">id of pack to change</param>
+        /// <param name="joTicketPack">data of pack</param>
+        /// <returns></returns>
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
