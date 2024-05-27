@@ -1,18 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
-using System.Net.Sockets;
-using System.Text.Json.Nodes;
 using System.Text.Json;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using SiteWebJO2.Services;
 using System.Security.Cryptography;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using static System.Net.WebRequestMethods;
 
 namespace SiteWebJO2.Controllers
 {

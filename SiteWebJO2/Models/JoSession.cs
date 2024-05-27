@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
-
+﻿
 namespace SiteWebJO2.Models
 {
     public class JoSession

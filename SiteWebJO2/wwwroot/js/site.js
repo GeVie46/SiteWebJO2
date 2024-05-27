@@ -140,7 +140,7 @@ function displayShoppingCart() {
     }
 }
 
-
+// function to send a fetch request with POST method to a controller
 async function PostToController(url, data) {
 
     try {
@@ -163,7 +163,7 @@ async function PostToController(url, data) {
 }
 
 
-// function to create a new line for a ticket in shopping cart
+// function to create a new line for a ticket in shopping cart page
 function createTicketCard(countCard, ticket, nb) {
     let container = document.getElementById("shoppingCartTableBody");
 
@@ -425,7 +425,7 @@ function displayCheckoutPage() {
 }
 
 
-// function to create a new line for a ticket in checkout
+// function to create a new line for a ticket in checkout page
 function createCheckoutTicketCard(countCard, ticket, nb) {
     let container = document.getElementById("checkoutTableBody");
 

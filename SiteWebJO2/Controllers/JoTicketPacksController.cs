@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EllipticCurve.Utils;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SiteWebJO2.Controllers
 {
@@ -30,7 +22,7 @@ namespace SiteWebJO2.Controllers
         /// <summary>
         /// display JoTicketPacks, for admin account only
         /// </summary>
-        /// <returns></returns>
+        /// <returns>view of all existing packs</returns>
         public IActionResult Index()
         {
             // get JoTicketPack data
@@ -61,7 +53,7 @@ namespace SiteWebJO2.Controllers
         /// <summary>
         /// view to create a new JoTicketPack, for admin account only
         /// </summary>
-        /// <returns></returns>
+        /// <returns>view to create a new JoTicketPack</returns>
         public IActionResult Create()
         {
             return View();
@@ -71,9 +63,7 @@ namespace SiteWebJO2.Controllers
         /// create a new pack
         /// </summary>
         /// <param name="joTicketPack">data of pack</param>
-        /// <returns></returns>
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <returns>view that display the new pack</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("JoTicketPackId,JoTicketPackName,NbAttendees,ReductionRate,JoTicketPackStatus")] JoTicketPack joTicketPack)
@@ -102,7 +92,7 @@ namespace SiteWebJO2.Controllers
         /// display data of pack selected
         /// </summary>
         /// <param name="id">id of the pack chosen</param>
-        /// <returns></returns>
+        /// <returns>view of the selected pack</returns>
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -131,9 +121,7 @@ namespace SiteWebJO2.Controllers
         /// </summary>
         /// <param name="id">id of pack to change</param>
         /// <param name="joTicketPack">data of pack</param>
-        /// <returns></returns>
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        /// <returns>view of the changed pack</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("JoTicketPackId,JoTicketPackName,NbAttendees,ReductionRate,JoTicketPackStatus")] JoTicketPack joTicketPack)
@@ -176,7 +164,11 @@ namespace SiteWebJO2.Controllers
             return View(joTicketPack);
         }
 
-       
+       /// <summary>
+       /// function to check if a pack exists
+       /// </summary>
+       /// <param name="id">id of the pack to check</param>
+       /// <returns>boolean to say if the pack exists</returns>
         private bool JoTicketPackExists(int id)
         {
             return _applicationDbContext.JoTicketPacks.Any(e => e.JoTicketPackId == id);

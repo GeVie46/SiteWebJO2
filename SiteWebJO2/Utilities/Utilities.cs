@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using Microsoft.Extensions.Primitives;
-using SiteWebJO2.Models;
+﻿using SiteWebJO2.Models;
 using System.Security.Cryptography;
 using System.Text.Json;
 
@@ -10,10 +8,10 @@ namespace SiteWebJO2.Utilities
     {
 
         /// <summary>
-        /// Generate a 128-bit salt using a sequence of cryptographically strong random bytes.
+        /// Generate a 128-bit key using a sequence of cryptographically strong random bytes.
         /// code from https://learn.microsoft.com/fr-fr/aspnet/core/security/data-protection/consumer-apis/password-hashing?view=aspnetcore-8.0
         /// </summary>
-        /// <returns></returns>
+        /// <returns>a 128-bit key</returns>
         public static byte[] GenerateSecureKey()
         {
             byte[] key = RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes

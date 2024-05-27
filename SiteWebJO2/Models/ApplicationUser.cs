@@ -6,12 +6,13 @@ using System.Security.Cryptography;
 
 namespace SiteWebJO2.Models
 {
-    /*
-     * class ApplicationUser: herited from IdentityUser
-     * property Name : user firstname
-     * property Lastname : user lastname
-     * property Userkey : RandomNumberGenerator, generated with method GenerateUserKey
-     */
+
+    /// <summary>
+    /// class ApplicationUser: herited from IdentityUser
+    /// property Name : user firstname
+    /// property Lastname : user lastname
+    /// property Userkey : RandomNumberGenerator, generated with method GenerateUserKey
+    /// </summary>
     public class ApplicationUser : IdentityUser
     {
         [PersonalData]

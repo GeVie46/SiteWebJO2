@@ -4,63 +4,41 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using SiteWebJO2.Data;
 using SiteWebJO2.Models;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Sockets;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using Microsoft.AspNetCore.Http;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Reflection.Metadata.Ecma335;
-using System.Drawing;
 using System.Security.Cryptography;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
-using SiteWebJO2.Utilities;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using System.Text.Encodings.Web;
 using QRCoder;
-using System.Net.Mail;
 using SiteWebJO2.Services;
 using Microsoft.Extensions.Options;
-using System.Numerics;
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.IO;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using static System.Net.WebRequestMethods;
-using EllipticCurve.Utils;
 
 
 namespace SiteWebJO2.Controllers
 {
 
-    /*
-     * * Manage shopping cart
-     * access only for authentified users
-     */
+    /// <summary>
+    /// Controller to manage shopping cart
+    /// </summary>
     [Authorize]
     [AutoValidateAntiforgeryToken]
     public class ShoppingCartsController : Controller
     {
         private readonly ApplicationDbContext _applicationDbContext;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IWebHostEnvironment _env;
        
         // to get the SendGrid key
         public AuthMessageSenderOptions Options { get; } //Set with Secret Manager.
 
         //constructor, with dependency injection of dbContext
-        public ShoppingCartsController(ApplicationDbContext applicationDbContext, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, IOptions<AuthMessageSenderOptions> optionsAccessor)
+        public ShoppingCartsController(ApplicationDbContext applicationDbContext, IWebHostEnvironment environment, IOptions<AuthMessageSenderOptions> optionsAccessor)
         {
             _applicationDbContext = applicationDbContext;
-            _userManager = userManager;
             _env = environment; // to get wwwroot path
             Options = optionsAccessor.Value;
         }

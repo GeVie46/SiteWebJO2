@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SiteWebJO2.Models;
 using SiteWebJO2.Data;
-using System.Collections.Immutable;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 
 namespace SiteWebJO2.Controllers
@@ -18,6 +16,15 @@ namespace SiteWebJO2.Controllers
             _applicationDbContext = applicationDbContext;
         }
 
+
+        /// <summary>
+        /// display list of sessions
+        /// </summary>
+        /// <param name="sortOrder">user can choose the sort order</param>
+        /// <param name="currentFilter">filter already used to filter the list</param>
+        /// <param name="searchString">the string the list is filtered on</param>
+        /// <param name="pageNumber">the number of the page displayed</param>
+        /// <returns>view according to filter and sort parameters</returns>
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
@@ -78,10 +85,12 @@ namespace SiteWebJO2.Controllers
             return View(await PaginatedList<JoSession>.CreateAsync(js.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        /*
-         * display offers concerning JoSession selected
-         */
 
+        /// <summary>
+        /// display offers concerning JoSession selected
+        /// </summary>
+        /// <param name="joSessionId">id of session chosen</param>
+        /// <returns>view</returns>
         [Route("JoSessions/Details/{joSessionId}")]
         public async Task<IActionResult> Details(int? joSessionId)
         {
@@ -113,37 +122,47 @@ namespace SiteWebJO2.Controllers
         }
 
 
-        /*
-         * get available JoSessions
-         */
+
+        /// <summary>
+        /// get available JoSessions
+        /// </summary>
+        /// <param name="joSessionsList">all existing sessions</param>
+        /// <returns>list of available sessions</returns>
         public static IQueryable<JoSession> GetAvailableJoSessions(IQueryable<JoSession> joSessionsList)
         {
             return joSessionsList.Where(s => s.JoSessionNbTotalBooked < s.JoSessionNbTotalAttendees);
         }
 
-        /*
-         * get on use JoTicketPack
-         */
+
+        /// <summary>
+        /// get on use JoTicketPack
+        /// </summary>
+        /// <param name="joTicketPacksList">all existing packs</param>
+        /// <returns>list of packs in use</returns>
         public static IQueryable<JoTicketPack> GetOnUseJoTicketPacks(IQueryable<JoTicketPack> joTicketPacksList)
         {
             return joTicketPacksList.Where(p => p.JoTicketPackStatus);
         }
 
-        /*
-         * calculate price of joTicketPack
-         * @param 
-         */
+
+        /// <summary>
+        /// calculate price of joTicketPack
+        /// </summary>
+        /// <param name="joSessionPrice">price of 1 attendee for the session</param>
+        /// <param name="nbAttendees">number of attendees</param>
+        /// <param name="reductionRate">reduction to apply to the price</param>
+        /// <returns>price for the session and pack chosen</returns>
         public static decimal GetJoTicketPackPrice (decimal joSessionPrice, int nbAttendees, decimal reductionRate)
         {
             return Math.Round(Convert.ToDecimal(joSessionPrice) * (1 - reductionRate) * nbAttendees, 2);
         }
 
 
-        /* 
-         * add data in database, call it manually with .../JoSessions/AddData
-         * create JoSessions, JoTicketsPacks
-         * access only for ADMIN
-         */
+        /// <summary>
+        /// add data in database, call it manually with .../JoSessions/AddData
+        /// create JoSessions, JoTicketsPacks
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddData()
         {

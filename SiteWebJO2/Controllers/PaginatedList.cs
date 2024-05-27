@@ -6,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SiteWebJO2.Controllers
 {
+    /// <summary>
+    /// class used to filter and sort the sessions list
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class PaginatedList<T> : List<T>
     {
         public int PageIndex { get; private set; }
