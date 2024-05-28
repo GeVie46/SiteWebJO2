@@ -188,6 +188,7 @@ namespace SiteWebJO2.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
+                    _logger.LogInformation(error.Description);
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
